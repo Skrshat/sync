@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=OfflineSync
+Comment=Синхронизация файлов между Ubuntu и Android
+Exec=python3 /home/gb/AndroidStudioProjects/android_app/offline-sync-gui.py
+Icon=folder-sync
+Terminal=false
+Categories=Network;Utility;

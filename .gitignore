@@ -1,0 +1,35 @@
+*.dex
+*.iml
+.gradle
+testfile
+/local.properties
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+.DS_Store
+app/build
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+# Виртуальные окружения
+venv/
+env/
+.ai_cli_env/
+
+# Кеши и временные файлы
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Логи
+*.log
+
+# Конфигурации IDE
+.vscode/
+.idea/
