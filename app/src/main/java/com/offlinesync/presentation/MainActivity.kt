@@ -1,39 +1,52 @@
 package com.offlinesync.presentation
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.offlinesync.presentation.screens.DevicesScreen // Will create this later
-import com.offlinesync.presentation.screens.FoldersScreen // Will create this later
-import com.offlinesync.presentation.screens.HomeScreen // Will create this later
+import com.offlinesync.presentation.screens.FoldersScreen
+import com.offlinesync.presentation.screens.HomeScreen
 import com.offlinesync.presentation.screens.BackupContactsScreen
-import com.offlinesync.presentation.screens.RestoreContactsScreen // Added for restore
+import com.offlinesync.presentation.screens.RestoreContactsScreen
+import com.offlinesync.presentation.screens.BackupSmsScreen
+import com.offlinesync.presentation.screens.RestoreSmsScreen
+import com.offlinesync.presentation.screens.BackupAppsScreen
+import com.offlinesync.presentation.screens.SettingsScreen
 import com.offlinesync.presentation.theme.OfflineSyncTheme
+import com.offlinesync.utils.LanguageManager
 import dagger.hilt.android.AndroidEntryPoint
 import com.offlinesync.service.MDNSService
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import android.util.Log
-import androidx.compose.ui.unit.dp
-
 
 @AndroidEntryPoint
+@OptIn(ExperimentalMaterial3Api::class)
 class MainActivity : ComponentActivity() {
 
     private lateinit var mdnsService: MDNSService
+
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(LanguageManager.setLocale(newBase))
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,7 +54,6 @@ class MainActivity : ComponentActivity() {
         mdnsService = MDNSService(this)
         mdnsService.startDiscovery()
 
-        // Observe discovered services (for prototyping, just log)
         lifecycleScope.launch {
             mdnsService.discoveredServices.collect { serviceInfo ->
                 Log.d("MDNSService", "Discovered: $serviceInfo")
@@ -51,64 +63,106 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             OfflineSyncTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
+                Scaffold(
+                    topBar = {
+                        TopAppBar(
+                            title = {
+                                Box(
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        text = "OfflineSync",
+                                        style = MaterialTheme.typography.headlineMedium,
+                                        textAlign = TextAlign.Center
+                                    )
+                                }
+                            }
+                        )
+                    }
+                ) { paddingValues ->
                     val navController = rememberNavController()
-
-                    Scaffold(
-                        topBar = {
-                            Text(text = "OfflineSync", style = MaterialTheme.typography.headlineLarge, modifier = Modifier.padding(16.dp))
+                    
+                    NavHost(
+                        navController = navController,
+                        startDestination = "home",
+                        modifier = Modifier.padding(paddingValues)
+                    ) {
+                        composable("home") {
+                            HomeScreen(
+                                onNavigateToFolders = { navController.navigate("folders") },
+                                onNavigateToBackupContacts = { navController.navigate("backupContacts") },
+                                onNavigateToRestoreContacts = { navController.navigate("restoreContacts") },
+                                onNavigateToBackupSms = { navController.navigate("backupSms") },
+                                onNavigateToRestoreSms = { navController.navigate("restoreSms") },
+                                onNavigateToBackupApps = { navController.navigate("backupApps") },
+                                onNavigateToSettings = { navController.navigate("settings") }
+                            )
                         }
-                    ) { paddingValues ->
-                        NavHost(
-                            navController = navController,
-                            startDestination = "home",
-                            modifier = Modifier.padding(paddingValues)
-                        ) {
-                            composable("home") {
-                                HomeScreen(
-                                    paddingValues = paddingValues, // Pass paddingValues
-                                    onNavigateToDevices = { navController.navigate("devices") },
-                                    onNavigateToFolders = { navController.navigate("folders") },
-                                    onNavigateToBackupContacts = { navController.navigate("backupContacts") },
-                                    onNavigateToRestoreContacts = { navController.navigate("restoreContacts") }
-                                )
-                            }
-                            composable("devices") {
-                                // Placeholder for DevicesScreen
-                                Text("Devices Screen", modifier = Modifier.fillMaxSize())
-                                // DevicesScreen(onNavigateBack = { navController.popBackStack() })
-                            }
-                            composable("folders") {
-                                // Placeholder for FoldersScreen
-                                Text("Folders Screen", modifier = Modifier.fillMaxSize())
-                                // FoldersScreen(onNavigateBack = { navController.popBackStack() })
-                                }
-                                composable("backupContacts") {
-                                    BackupContactsScreen()
-                                }
-                                composable("restoreContacts") {
-                                    RestoreContactsScreen()
-                                }
-                                }
-                                }
-                                }
-                                }
-                                }
-                                }
+                        composable("folders") {
+                            FoldersScreen(
+                                onNavigateBack = { navController.popBackStack() },
+                                onNavigateHome = { navController.navigate("home") {
+                                    popUpTo("home") { inclusive = true }
+                                } }
+                            )
+                        }
+                        composable("backupContacts") {
+                            BackupContactsScreen(
+                                onNavigateBack = { navController.popBackStack() },
+                                onNavigateHome = { navController.navigate("home") {
+                                    popUpTo("home") { inclusive = true }
+                                } }
+                            )
+                        }
+                        composable("restoreContacts") {
+                            RestoreContactsScreen(
+                                onNavigateBack = { navController.popBackStack() },
+                                onNavigateHome = { navController.navigate("home") {
+                                    popUpTo("home") { inclusive = true }
+                                } }
+                            )
+                        }
+                        composable("backupSms") {
+                            BackupSmsScreen(
+                                onNavigateBack = { navController.popBackStack() },
+                                onNavigateHome = { navController.navigate("home") {
+                                    popUpTo("home") { inclusive = true }
+                                } }
+                            )
+                        }
+                        composable("restoreSms") {
+                            RestoreSmsScreen(
+                                onNavigateBack = { navController.popBackStack() },
+                                onNavigateHome = { navController.navigate("home") {
+                                    popUpTo("home") { inclusive = true }
+                                } }
+                            )
+                        }
+                        composable("backupApps") {
+                            BackupAppsScreen(
+                                onNavigateBack = { navController.popBackStack() },
+                                onNavigateHome = { navController.navigate("home") {
+                                    popUpTo("home") { inclusive = true }
+                                } }
+                            )
+                        }
+                        composable("settings") {
+                            SettingsScreen(
+                                onNavigateBack = { navController.popBackStack() },
+                                onNavigateHome = { navController.navigate("home") {
+                                    popUpTo("home") { inclusive = true }
+                                } }
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     override fun onDestroy() {
         super.onDestroy()
         mdnsService.stopDiscovery()
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    OfflineSyncTheme {
-        Text("Hello Android!")
     }
 }

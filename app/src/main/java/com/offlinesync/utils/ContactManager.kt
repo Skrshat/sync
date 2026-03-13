@@ -292,10 +292,10 @@ class ContactManager @Inject constructor(@ApplicationContext private val context
     }
 }
 
-@Serializable // Added for JSON serialization
+@Serializable
 data class Contact(
     val name: String,
     val phoneNumbers: List<String>,
     val emails: List<String>,
-    val origin: String // "SIM" or "DEVICE"
+    val origin: String
 )

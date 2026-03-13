@@ -12,8 +12,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import java.io.File
-import androidx.activity.ComponentActivity // Added import
 import javax.inject.Inject
 
 @HiltViewModel
@@ -67,9 +69,10 @@ class BackupContactsViewModel @Inject constructor(
                     if (!backupDir.exists()) {
                         backupDir.mkdirs()
                     }
-                    val backupFile = File(backupDir, "contacts.json")
+                    val timestamp = SimpleDateFormat("yyyy-MM-dd_HH-mm-ss", Locale.getDefault()).format(Date())
+                    val backupFile = File(backupDir, "contacts_$timestamp.json")
                     backupFile.writeText(jsonString)
-                    _backupStatus.value = "Backup successful! Saved to ${backupFile.absolutePath}"
+                    _backupStatus.value = "Backup successful! Saved to ${backupFile.name}"
                 } catch (e: Exception) {
                     _backupStatus.value = "Backup failed: ${e.message}"
                 }

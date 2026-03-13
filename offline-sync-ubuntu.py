@@ -12,6 +12,7 @@ import hashlib
 import requests
 from pathlib import Path
 from typing import Optional
+from urllib.parse import quote
 import zeroconf
 
 
@@ -100,17 +101,43 @@ class OfflineSyncClient:
                 md5.update(chunk)
         return md5.hexdigest()
     
-    def list_android_files(self) -> list:
-        """Получение списка файлов на Android"""
+    def list_android_items(self) -> list:
+        """Получение списка файлов и папок на Android"""
         try:
             r = requests.get(f"{self.base_url}/files", timeout=10)
             if r.status_code == 200:
                 data = r.json()
-                files = data.get('files', [])
-                return [f.get('name') if isinstance(f, dict) else f for f in files]
+                items = data.get('items', [])
+                return items
         except:
             pass
         return []
+    
+    def get_installed_apps(self) -> list:
+        """Получение списка установленных приложений"""
+        try:
+            r = requests.get(f"{self.base_url}/apps", timeout=30)
+            if r.status_code == 200:
+                data = r.json()
+                apps = data.get('apps', [])
+                return apps
+        except Exception as e:
+            print(f"Ошибка получения списка приложений: {e}")
+        return []
+    
+    def save_apps_list(self) -> bool:
+        """Сохранение списка приложений в файл"""
+        apps = self.get_installed_apps()
+        if apps:
+            apps_file = self.sync_folder / "installed_apps.txt"
+            with open(apps_file, 'w', encoding='utf-8') as f:
+                f.write("Список установленных приложений\n")
+                f.write("=" * 40 + "\n\n")
+                for app in sorted(apps, key=lambda x: x.get('name', '')):
+                    f.write(f"{app.get('name', '')} ({app.get('package', '')})\n")
+            print(f"Сохранено приложений: {len(apps)}")
+            return True
+        return False
     
     def upload_file(self, filepath: Path) -> bool:
         """Загрузка файла на Android"""
@@ -130,16 +157,19 @@ class OfflineSyncClient:
     def download_file(self, filename: str) -> bool:
         """Скачивание файла с Android"""
         try:
-            r = requests.get(f"{self.base_url}/download/{filename}", timeout=300, stream=True)
+            url = f"{self.base_url}/download?path={quote(filename)}"
+            print(f"Скачивание: {filename}")
+            r = requests.get(url, timeout=300, stream=True)
             if r.status_code == 200:
                 filepath = self.sync_folder / filename
+                filepath.parent.mkdir(parents=True, exist_ok=True)
                 with open(filepath, 'wb') as f:
                     for chunk in r.iter_content(chunk_size=8192):
                         f.write(chunk)
                 print(f"Скачано: {filename}")
                 return True
             else:
-                print(f"Ошибка скачивания: {r.status_code}")
+                print(f"Ошибка скачивания: {r.status_code} - {r.text}")
         except Exception as e:
             print(f"Ошибка: {e}")
         return False
@@ -151,9 +181,10 @@ class OfflineSyncClient:
                 return 0
         
         uploaded = 0
-        for filepath in self.sync_folder.iterdir():
+        for filepath in self.sync_folder.rglob('*'):
             if filepath.is_file():
-                print(f"Загрузка: {filepath.name}")
+                rel_path = str(filepath.relative_to(self.sync_folder))
+                print(f"Загрузка: {rel_path}")
                 if self.upload_file(filepath):
                     uploaded += 1
         return uploaded
@@ -165,22 +196,26 @@ class OfflineSyncClient:
                 return 0
         
         downloaded = 0
-        android_files = self.list_android_files()
+        android_items = self.list_android_items()
         
-        for filename in android_files:
-            filepath = self.sync_folder / filename
-            should_download = True
+        for item in android_items:
+            name = item.get('name', '')
+            is_dir = item.get('isDirectory', False)
             
-            if filepath.exists():
-                # Сравниваем хеши
-                local_hash = self.get_file_hash(filepath)
-                # Примечание: на Android нужно получить хеш файла
-                # Для простоты - скачиваем если размера отличаются
-                print(f"Файл уже существует: {filename}")
-            
-            if should_download:
-                if self.download_file(filename):
-                    downloaded += 1
+            if is_dir:
+                # Create directory locally
+                local_path = self.sync_folder / name
+                local_path.mkdir(parents=True, exist_ok=True)
+                print(f"Создана папка: {name}")
+                downloaded += 1
+            else:
+                # Download file
+                filepath = self.sync_folder / name
+                if not filepath.exists():
+                    if self.download_file(name):
+                        downloaded += 1
+                else:
+                    print(f"Файл уже существует: {name}")
         
         return downloaded
     
@@ -193,24 +228,37 @@ class OfflineSyncClient:
         uploaded = 0
         downloaded = 0
         
-        # Загружаем новые/изменённые файлы на Android
-        for filepath in self.sync_folder.iterdir():
-            if filepath.is_file():
-                if self.upload_file(filepath):
-                    uploaded += 1
+        # Get Android items
+        android_items = self.list_android_items()
+        android_names = set(item.get('name', '') for item in android_items if not item.get('isDirectory', False))
         
-        # Скачиваем файлы с Android
-        android_files = self.list_android_files()
-        for file_info in android_files:
-            if isinstance(file_info, dict):
-                filename = file_info.get('name')
+        # Upload new files to Android
+        for filepath in self.sync_folder.rglob('*'):
+            if filepath.is_file():
+                rel_path = str(filepath.relative_to(self.sync_folder))
+                if rel_path not in android_names:
+                    if self.upload_file(filepath):
+                        uploaded += 1
+        
+        # Download files and folders from Android
+        for item in android_items:
+            name = item.get('name', '')
+            is_dir = item.get('isDirectory', False)
+            
+            if is_dir:
+                local_path = self.sync_folder / name
+                if not local_path.exists():
+                    local_path.mkdir(parents=True, exist_ok=True)
+                    print(f"Создана папка: {name}")
+                    downloaded += 1
             else:
-                filename = file_info
-            if filename:
-                filepath = self.sync_folder / filename
+                filepath = self.sync_folder / name
                 if not filepath.exists():
-                    if self.download_file(filename):
+                    if self.download_file(name):
                         downloaded += 1
+        
+        # Save apps list
+        self.save_apps_list()
         
         return {'uploaded': uploaded, 'downloaded': downloaded}
 

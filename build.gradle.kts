@@ -2,13 +2,14 @@
 plugins {
     alias(libs.plugins.androidApplication) apply false
     alias(libs.plugins.jetbrainsKotlinAndroid) apply false
-    alias(libs.plugins.compose.compiler) apply false
+
     alias(libs.plugins.kotlinSerialization) apply false
     alias(libs.plugins.ksp) apply false
     alias(libs.plugins.hilt) apply false
+
+    alias(libs.plugins.kotlinCompose) apply false
 }
 buildscript {
     extra.apply {
-        set("kotlinCompilerExtensionVersion", "1.5.5") // Ensure this matches composeOptions in app module
     }
 }

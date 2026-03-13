@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">OfflineSync</string>
+    
+    <!-- Main Menu -->
+    <string name="browse_files">Файли</string>
+    <string name="backup_contacts">Резервна копія контактів</string>
+    <string name="restore_contacts">Відновити контакти</string>
+    <string name="help">Допомога</string>
+    <string name="settings">Налаштування</string>
+    <string name="language">Мова</string>
+    
+    <!-- Settings -->
+    <string name="select_language">Виберіть мову</string>
+    <string name="restart_required">Потрібен перезапуск для зміни мови</string>
+    <string name="restart_now">Перезапустити</string>
+    <string name="later">Пізніше</string>
+    
+    <!-- Backup/Restore -->
+    <string name="start_backup">Почати резервне копіювання</string>
+    <string name="backup_successful">Резервна копія створена!</string>
+    <string name="backup_failed">Помилка резервного копіювання</string>
+    <string name="no_contacts">Контакти не знайдені</string>
+    <string name="request_permission">Запит дозволу</string>
+    <string name="contacts_permission">Дозвіл на контакти</string>
+    <string name="phone_state_permission">Дозвіл на стан телефону</string>
+    <string name="write_contacts_permission">Дозвіл на запис контактів</string>
+    
+    <!-- Files -->
+    <string name="empty_folder">Папка пуста</string>
+    <string name="downloads">Завантаження</string>
+    
+    <!-- Sync -->
+    <string name="syncing">Синхронізація…</string>
+    <string name="sync_complete">Синхронізація завершена</string>
+    <string name="uploaded">Завантажено</string>
+    <string name="downloaded">Скачано</string>
+    <string name="file_exists">Файл існує</string>
+    <string name="overwrite">Перезаписати</string>
+    <string name="rename">Перейменувати</string>
+    <string name="cancel">Скасувати</string>
+    <string name="cancel_all">Скасувати все</string>
+    
+    <!-- Help -->
+    <string name="help_title">Допомога</string>
+    <string name="help_content">OfflineSync дозволяє синхронізувати файли між Android та комп\'ютером без інтернету.\n\n1. Підключіть обидва пристрої до однієї WiFi мережі\n2. Запустіть сервер на Android\n3. Запустіть синхронізацію на комп\'ютері\n\nФайли зберігаються в папці Завантаження/OfflineSync.</string>
+</resources>
