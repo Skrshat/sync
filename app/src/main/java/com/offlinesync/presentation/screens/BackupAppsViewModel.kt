@@ -80,6 +80,10 @@ class BackupAppsViewModel @Inject constructor() : ViewModel() {
                 val appInfo = packageInfo.applicationInfo
                 val isSystemApp = (appInfo?.flags ?: 0) and ApplicationInfo.FLAG_SYSTEM != 0
 
+                if (isSystemApp) {
+                    continue
+                }
+
                 val appName = try {
                     appInfo?.let { context.packageManager.getApplicationLabel(it).toString() } ?: packageInfo.packageName
                 } catch (e: Exception) {
@@ -91,7 +95,6 @@ class BackupAppsViewModel @Inject constructor() : ViewModel() {
                 app["app_name"] = appName
                 app["version_name"] = packageInfo.versionName ?: ""
                 app["version_code"] = packageInfo.longVersionCode
-                app["is_system_app"] = isSystemApp
                 app["install_time"] = packageInfo.firstInstallTime
                 app["update_time"] = packageInfo.lastUpdateTime
                 appsList.add(app)
@@ -105,10 +108,7 @@ class BackupAppsViewModel @Inject constructor() : ViewModel() {
         val jsonContent = buildJsonApps(sortedApps)
         appsFile.writeText(jsonContent)
 
-        val systemApps = sortedApps.count { it["is_system_app"] as Boolean }
-        val userApps = sortedApps.size - systemApps
-
-        "Exported ${sortedApps.size} apps ($userApps user, $systemApps system) to ${appsFile.name}"
+        "Exported ${sortedApps.size} user apps to ${appsFile.name}"
     }
 
     private fun buildJsonApps(appsList: List<Map<String, Any>>): String {
@@ -121,7 +121,6 @@ class BackupAppsViewModel @Inject constructor() : ViewModel() {
             sb.append("\"app_name\":\"${escapeJson(app["app_name"].toString())}\",")
             sb.append("\"version_name\":\"${escapeJson(app["version_name"].toString())}\",")
             sb.append("\"version_code\":${app["version_code"]},")
-            sb.append("\"is_system_app\":${app["is_system_app"]},")
             sb.append("\"install_time\":${app["install_time"]},")
             sb.append("\"update_time\":${app["update_time"]}")
             sb.append("}")
