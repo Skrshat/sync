@@ -64,7 +64,7 @@ class BackupContactsViewModel @Inject constructor(
                     val jsonString = Json.encodeToString(allContacts)
                     val backupDir = File(
                         Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
-                        "OfflineSync/Backups"
+                        "OfflineSync"
                     )
                     if (!backupDir.exists()) {
                         backupDir.mkdirs()

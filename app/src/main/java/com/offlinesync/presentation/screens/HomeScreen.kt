@@ -99,7 +99,7 @@ fun MenuButton(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(80.dp)
+            .height(160.dp)
             .clickable(onClick = onClick)
     ) {
         Row(
@@ -112,7 +112,7 @@ fun MenuButton(
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                modifier = Modifier.size(40.dp)
+                modifier = Modifier.size(80.dp)
             )
             Spacer(modifier = Modifier.size(16.dp))
             Text(
