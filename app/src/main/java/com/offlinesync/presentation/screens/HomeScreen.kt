@@ -12,7 +12,8 @@ import androidx.compose.ui.Modifier
 @Composable
 fun HomeScreen(
     onNavigateToDevices: () -> Unit,
-    onNavigateToFolders: () -> Unit
+    onNavigateToFolders: () -> Unit,
+    onNavigateToBackupContacts: () -> Unit
 ) {
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -25,6 +26,9 @@ fun HomeScreen(
         }
         Button(onClick = onNavigateToFolders) {
             Text("Go to Folders")
+        }
+        Button(onClick = onNavigateToBackupContacts) {
+            Text("Backup Contacts")
         }
     }
 }

@@ -19,6 +19,7 @@ import androidx.navigation.compose.rememberNavController
 import com.offlinesync.presentation.screens.DevicesScreen // Will create this later
 import com.offlinesync.presentation.screens.FoldersScreen // Will create this later
 import com.offlinesync.presentation.screens.HomeScreen // Will create this later
+import com.offlinesync.presentation.screens.BackupContactsScreen
 import com.offlinesync.presentation.theme.OfflineSyncTheme
 import dagger.hilt.android.AndroidEntryPoint
 import com.offlinesync.service.MDNSService
@@ -68,7 +69,8 @@ class MainActivity : ComponentActivity() {
                             composable("home") {
                                 HomeScreen(
                                     onNavigateToDevices = { navController.navigate("devices") },
-                                    onNavigateToFolders = { navController.navigate("folders") }
+                                    onNavigateToFolders = { navController.navigate("folders") },
+                                    onNavigateToBackupContacts = { navController.navigate("backupContacts") }
                                 )
                             }
                             composable("devices") {
@@ -80,13 +82,15 @@ class MainActivity : ComponentActivity() {
                                 // Placeholder for FoldersScreen
                                 Text("Folders Screen", modifier = Modifier.fillMaxSize())
                                 // FoldersScreen(onNavigateBack = { navController.popBackStack() })
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
+                                }
+                                composable("backupContacts") {
+                                BackupContactsScreen()
+                                }
+                                }
+                                }
+                                }
+                                }
+                                }    }
 
     override fun onDestroy() {
         super.onDestroy()
