@@ -40,7 +40,7 @@ class WebServer(private val context: Context, private val serverPort: Int = 8080
             stop()
         }
 
-        server = embeddedServer(Netty, port = serverPort, host = address.hostAddress) {
+        server = embeddedServer(Netty, port = serverPort, host = address.hostAddress ?: "0.0.0.0") {
             routing {
                 get("/") {
                     call.respondText("OfflineSync Android Server", ContentType.Text.Plain)
@@ -88,10 +88,25 @@ class WebServer(private val context: Context, private val serverPort: Int = 8080
 
                 get("/files") {
                     val syncDir = getSyncDirectory()
-                    val files = syncDir.listFiles()?.map { file ->
-                        "{\"name\":\"${file.name}\",\"size\":${file.length()},\"modified\":${file.lastModified()}}"
-                    } ?: emptyList()
-                    val json = "{\"files\":[${files.joinToString(",")}]}"
+                    val allFiles = mutableListOf<File>()
+
+                    // Recursively get all files
+                    fun listFilesRecursive(directory: File) {
+                        directory.listFiles()?.forEach { file ->
+                            if (file.isFile) {
+                                allFiles.add(file)
+                            } else if (file.isDirectory) {
+                                listFilesRecursive(file)
+                            }
+                        }
+                    }
+                    listFilesRecursive(syncDir)
+
+                    val filesJson = allFiles.map { file ->
+                        val relativePath = file.toRelativeString(syncDir)
+                        "{\"name\":\"$relativePath\",\"size\":${file.length()},\"modified\":${file.lastModified()}}"
+                    }
+                    val json = "{\"files\":[${filesJson.joinToString(",")}]}"
                     call.respondText(json, ContentType.Application.Json)
                 }
 
