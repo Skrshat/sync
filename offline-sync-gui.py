@@ -457,6 +457,8 @@ class OfflineSyncGUI:
                   command=self.ftp_upload_dir).pack(side=tk.LEFT, padx=2)
         tk.Button(ftp_btn_row, text=self.lang.t("ftp_refresh"), 
                   command=self.ftp_refresh).pack(side=tk.LEFT, padx=2)
+        tk.Button(ftp_btn_row, text="CDUP", 
+                  command=self.ftp_cdup).pack(side=tk.LEFT, padx=2)
         
         log_frame = tk.LabelFrame(self.root, text=self.lang.t("log"), padx=10, pady=10)
         log_frame.pack(fill=tk.BOTH, expand=True, padx=20, pady=10)
@@ -746,15 +748,24 @@ class OfflineSyncGUI:
                     self.ftp.close()
             
             self.ftp = FTP()
+            
+            # Enable passive mode for better compatibility
+            self.ftp.set_pasv(True)
+            
             self.ftp.connect(ip, port, timeout=30)
-            self.ftp.login(user, password)
+            
+            resp = self.ftp.login(user, password)
+            self.root.after(0, lambda: self.log(f"FTP: Login OK"))
+            
             self.ftp_current_dir = self.ftp.pwd()
+            self.root.after(0, lambda: self.log(f"FTP: Connected to {ip}:{port}, dir: {self.ftp_current_dir}"))
             
             self.ftp_connected = True
             self.root.after(0, self._ftp_on_connected)
             self.root.after(0, self.ftp_refresh)
         except Exception as e:
-            self.root.after(0, lambda: messagebox.showerror(self.lang.t("error"), f"FTP Error: {e}"))
+            err = str(e)
+            self.root.after(0, lambda err=err: messagebox.showerror(self.lang.t("error"), f"FTP Error: {err}"))
     
     def _ftp_on_connected(self):
         self.ftp_status_label.config(text=f"{self.lang.t('ftp_connected')}: {self.ftp_ip}", fg="green")
@@ -782,14 +793,72 @@ class OfflineSyncGUI:
         
         threading.Thread(target=self._ftp_refresh, daemon=True).start()
     
+    def ftp_cdup(self):
+        """Go to parent directory"""
+        if not self.ftp_connected or not self.ftp:
+            return
+        
+        if self.ftp_current_dir != "/":
+            self.ftp_current_dir = "/".join(self.ftp_current_dir.rstrip("/").split("/")[:-1])
+            if self.ftp_current_dir == "":
+                self.ftp_current_dir = "/"
+            self.ftp_dir_label.config(text=self.ftp_current_dir)
+            self.ftp_refresh()
+    
     def _ftp_refresh(self):
         try:
+            self.root.after(0, lambda: self.log(f"FTP: Listing {self.ftp_current_dir}..."))
+            
             self.ftp.cwd(self.ftp_current_dir)
+            
+            items = []
+            
+            # Try MLSD first (modern standard)
+            try:
+                lines = []
+                self.ftp.retrlines('MLSD', lines.append)
+                self.root.after(0, lambda: self.log(f"FTP: MLSD returned {len(lines)} items"))
+                
+                for line in lines:
+                    parts = line.split(';', 1)
+                    if len(parts) == 2:
+                        facts = parts[0].strip()
+                        name = parts[1].strip()
+                        is_dir = 'type=dir' in facts.lower()
+                        prefix = "[DIR]" if is_dir else "[FILE]"
+                        items.append(f"{prefix} {name}")
+                
+                if items:
+                    self.root.after(0, lambda: self._update_ftp_list(items))
+                    return
+            except Exception as mlsd_err:
+                self.root.after(0, lambda: self.log(f"FTP: MLSD failed: {mlsd_err}"))
+            
+            # Try NLST
+            try:
+                files = []
+                self.ftp.retrlines('NLST', files.append)
+                self.root.after(0, lambda: self.log(f"FTP: NLST returned: {files}"))
+                
+                for name in files:
+                    if name and name != '.' and name != '..':
+                        items.append(f"[FILE] {name}")
+                
+                if items:
+                    self.root.after(0, lambda: self._update_ftp_list(items))
+                    return
+            except Exception as nlst_err:
+                self.root.after(0, lambda: self.log(f"FTP: NLST failed: {nlst_err}"))
+            
+            # Fall back to LIST
             files = []
             self.ftp.retrlines('LIST', files.append)
             
-            items = []
+            self.root.after(0, lambda: self.log(f"FTP: LIST returned: {files}"))
+            
             for line in files:
+                if not line.strip():
+                    continue
                 parts = line.split()
                 if len(parts) >= 9:
                     is_dir = parts[0].startswith('d')
@@ -797,10 +866,18 @@ class OfflineSyncGUI:
                     if name not in ['.', '..']:
                         prefix = "[DIR]" if is_dir else "[FILE]"
                         items.append(f"{prefix} {name}")
+                elif len(parts) >= 2:
+                    name = parts[-1]
+                    if name not in ['.', '..']:
+                        items.append(f"[FILE] {name}")
+            
+            if not items:
+                items = ["[FILE] (empty directory)"]
             
             self.root.after(0, lambda: self._update_ftp_list(items))
-        except Exception as e:
-            self.root.after(0, lambda: self.log(f"FTP Error: {e}"))
+        except Exception as err:
+            e = str(err)
+            self.root.after(0, lambda err=e: self.log(f"FTP Error listing: {err}"))
     
     def _update_ftp_list(self, items):
         self.ftp_file_listbox.delete(0, tk.END)
@@ -817,7 +894,11 @@ class OfflineSyncGUI:
             item = self.ftp_file_listbox.get(selection[0])
             if item.startswith("[DIR]"):
                 name = item.replace("[DIR]", "").strip()
-                self.ftp_current_dir = f"{self.ftp_current_dir}/{name}".replace("//", "/")
+                if self.ftp_current_dir == "/":
+                    self.ftp_current_dir = "/" + name
+                else:
+                    self.ftp_current_dir = self.ftp_current_dir + "/" + name
+                self.ftp_current_dir = self.ftp_current_dir.replace("//", "/")
                 self.ftp_dir_label.config(text=self.ftp_current_dir)
                 self.ftp_refresh()
     
@@ -855,8 +936,9 @@ class OfflineSyncGUI:
                 self.ftp.retrbinary(f'RETR {filename}', f.write)
             
             self.root.after(0, lambda: self.log(f"FTP: Downloaded {filename}"))
-        except Exception as e:
-            self.root.after(0, lambda: self.log(f"FTP Error: {e}"))
+        except Exception as err:
+            e = str(err)
+            self.root.after(0, lambda err=e: self.log(f"FTP Error: {err}"))
     
     def ftp_download_dir(self):
         """Download directory from FTP"""
@@ -875,8 +957,9 @@ class OfflineSyncGUI:
         try:
             count = self._download_recursive(remote_dir, local_dir, 0)
             self.root.after(0, lambda: self.log(f"FTP: Downloaded {count} files"))
-        except Exception as e:
-            self.root.after(0, lambda: self.log(f"FTP Error: {e}"))
+        except Exception as err:
+            e = str(err)
+            self.root.after(0, lambda err=e: self.log(f"FTP Error: {err}"))
     
     def _download_recursive(self, remote_dir, local_dir, count):
         orig_dir = self.ftp.pwd()
@@ -933,8 +1016,9 @@ class OfflineSyncGUI:
             
             self.root.after(0, self.ftp_refresh)
             self.root.after(0, lambda: self.log(f"FTP: Uploaded {filename}"))
-        except Exception as e:
-            self.root.after(0, lambda: self.log(f"FTP Error: {e}"))
+        except Exception as err:
+            e = str(err)
+            self.root.after(0, lambda err=e: self.log(f"FTP Error: {err}"))
     
     def ftp_upload_dir(self):
         """Upload directory to FTP"""
@@ -955,8 +1039,9 @@ class OfflineSyncGUI:
             count = self._upload_recursive(folder, folder_name, 0)
             self.root.after(0, self.ftp_refresh)
             self.root.after(0, lambda: self.log(f"FTP: Uploaded {count} files"))
-        except Exception as e:
-            self.root.after(0, lambda: self.log(f"FTP Error: {e}"))
+        except Exception as err:
+            e = str(err)
+            self.root.after(0, lambda err=e: self.log(f"FTP Error: {err}"))
     
     def _upload_recursive(self, local_dir, remote_dir, count):
         local_path = Path(local_dir)

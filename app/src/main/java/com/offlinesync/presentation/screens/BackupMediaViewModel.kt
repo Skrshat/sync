@@ -1,8 +1,6 @@
 package com.offlinesync.presentation.screens
 
 import android.content.Context
-import android.media.MediaScannerConnection
-import android.os.Build
 import android.os.Environment
 import android.os.StatFs
 import android.util.Log

@@ -69,7 +69,7 @@ class FtpServer(private val context: Context, private val port: Int = 2121) {
                         val clientSocket = serverSocket?.accept()
                         clientSocket?.let { socket ->
                             val clientId = UUID.randomUUID().toString()
-                            val handler = ClientHandler(socket, rootDir, clientId)
+                            val handler = ClientHandler(socket, rootDir, clientId, currentIp)
                             clients[clientId] = handler
                             onClientConnect?.invoke(clientId)
                             
@@ -146,7 +146,8 @@ class FtpServer(private val context: Context, private val port: Int = 2121) {
 class ClientHandler(
     private val socket: Socket,
     private val rootDir: File,
-    private val clientId: String
+    private val clientId: String,
+    private val serverIp: String?
 ) {
     private val TAG = "FtpClient"
     private var currentDir: File = rootDir
@@ -220,6 +221,7 @@ class ClientHandler(
             "MKD" -> handleMkd(args)
             "RMD" -> handleRmd(args)
             "SIZE" -> handleSize(args)
+            "MLSD" -> handleMlsd(args)
             "OPTS" -> { sendResponse(200, "OK"); true }
             else -> { sendResponse(502, "Command not implemented"); true }
         }
@@ -265,21 +267,24 @@ class ClientHandler(
     
     private fun handlePasv(): Boolean {
         try {
-            dataServer = ServerSocket(0, 1, InetAddress.getByName(clientIp))
+            dataServer = ServerSocket(0, 1, InetAddress.getByName("0.0.0.0"))
             val port = dataServer!!.localPort
-            val ip = clientIp.split(".")
             
             val p1 = port / 256
             val p2 = port % 256
             
-            sendResponse(227, "Entering Passive Mode ($ip[0],$ip[1],$ip[2],$ip[3],$p1,$p2)")
+            val responseIp = serverIp ?: clientIp
             
-            CoroutineScope(Dispatchers.IO).launch {
-                try {
-                    dataSocket = dataServer?.accept()
-                } catch (e: Exception) {
-                    Log.e(TAG, "PASV accept error: ${e.message}")
-                }
+            sendResponse(227, "Entering Passive Mode ($responseIp,$p1,$p2)")
+            
+            // Wait for client to connect synchronously
+            try {
+                dataSocket = dataServer?.accept()
+                Log.d(TAG, "PASV: Client connected for data")
+            } catch (e: Exception) {
+                Log.e(TAG, "PASV accept error: ${e.message}")
+                sendResponse(425, "Can't open data connection")
+                return true
             }
         } catch (e: Exception) {
             Log.e(TAG, "PASV error: ${e.message}")
@@ -318,13 +323,14 @@ class ClientHandler(
             
             sendResponse(150, "Opening ASCII mode data connection")
             
-            val ds = dataSocket ?: run {
-                dataSocket = Socket(clientIp, clientDataPort)
-                dataSocket
+            if (dataSocket == null) {
+                Log.e(TAG, "LIST: No data socket available")
+                sendResponse(425, "No data connection")
+                return true
             }
             
-            ds?.getOutputStream()?.write(listData.toString().toByteArray())
-            ds?.close()
+            dataSocket?.getOutputStream()?.write(listData.toString().toByteArray())
+            dataSocket?.close()
             dataSocket = null
             
             sendResponse(226, "Transfer complete")
@@ -343,13 +349,14 @@ class ClientHandler(
             
             sendResponse(150, "Opening ASCII mode data connection")
             
-            val ds = dataSocket ?: run {
-                dataSocket = Socket(clientIp, clientDataPort)
-                dataSocket
+            if (dataSocket == null) {
+                // Need to accept PASV connection first
+                sendResponse(425, "No data connection")
+                return true
             }
             
-            ds?.getOutputStream()?.write(listData.toByteArray())
-            ds?.close()
+            dataSocket?.getOutputStream()?.write(listData.toByteArray())
+            dataSocket?.close()
             dataSocket = null
             
             sendResponse(226, "Transfer complete")
@@ -446,6 +453,36 @@ class ClientHandler(
             sendResponse(250, "Remove directory successful")
         } else {
             sendResponse(550, "Remove directory failed")
+        }
+        return true
+    }
+    
+    private fun handleMlsd(args: String): Boolean {
+        try {
+            val listData = StringBuilder()
+            
+            currentDir.listFiles()?.sortedWith(compareBy({ !it.isDirectory }, { it.name.lowercase() }))?.forEach { file ->
+                val type = if (file.isDirectory) "type=dir" else "type=file"
+                val size = "size=${file.length()}"
+                val mod = "modify=${SimpleDateFormat("yyyyMMddHHmmss", Locale.US).format(Date(file.lastModified()))}"
+                listData.appendLine("$type;$size;$mod ${file.name}")
+            }
+            
+            sendResponse(150, "Opening ASCII mode data connection")
+            
+            if (dataSocket == null) {
+                sendResponse(425, "No data connection")
+                return true
+            }
+            
+            dataSocket?.getOutputStream()?.write(listData.toString().toByteArray())
+            dataSocket?.close()
+            dataSocket = null
+            
+            sendResponse(226, "Transfer complete")
+        } catch (e: Exception) {
+            Log.e(TAG, "MLSD error: ${e.message}")
+            sendResponse(426, "Transfer failed")
         }
         return true
     }
