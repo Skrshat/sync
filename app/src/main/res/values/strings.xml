@@ -44,4 +44,18 @@
     <!-- Help -->
     <string name="help_title">Help</string>
     <string name="help_content">OfflineSync allows you to sync files between your Android device and computer without internet.\n\n1. Connect both devices to the same WiFi network\n2. Start the server on Android\n3. Run sync on your computer\n\nFiles are stored in Downloads/OfflineSync folder.</string>
+    
+    <!-- Media Backup -->
+    <string name="backup_media">Backup Media</string>
+    <string name="select_media_types">Select media types</string>
+    <string name="images">Images</string>
+    <string name="videos">Videos</string>
+    <string name="audio">Audio</string>
+    <string name="supported_messengers">Supported messengers</string>
+    <string name="backup_result">Backup Result</string>
+    <string name="total_files">Total files</string>
+    <string name="backed_up_files">Backed up files</string>
+    <string name="skipped_files">Skipped files</string>
+    <string name="backed_up_size">Backed up size</string>
+    <string name="source_details">Source details</string>
 </resources>

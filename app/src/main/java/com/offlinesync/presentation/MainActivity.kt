@@ -5,20 +5,9 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -29,6 +18,7 @@ import com.offlinesync.presentation.screens.RestoreContactsScreen
 import com.offlinesync.presentation.screens.BackupSmsScreen
 import com.offlinesync.presentation.screens.RestoreSmsScreen
 import com.offlinesync.presentation.screens.BackupAppsScreen
+import com.offlinesync.presentation.screens.BackupMediaScreen
 import com.offlinesync.presentation.screens.SettingsScreen
 import com.offlinesync.presentation.theme.OfflineSyncTheme
 import com.offlinesync.utils.LanguageManager
@@ -39,7 +29,6 @@ import kotlinx.coroutines.launch
 import android.util.Log
 
 @AndroidEntryPoint
-@OptIn(ExperimentalMaterial3Api::class)
 class MainActivity : ComponentActivity() {
 
     private lateinit var mdnsService: MDNSService
@@ -63,31 +52,13 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             OfflineSyncTheme {
-                Scaffold(
-                    topBar = {
-                        TopAppBar(
-                            title = {
-                                Box(
-                                    modifier = Modifier.fillMaxSize(),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Text(
-                                        text = "OfflineSync",
-                                        style = MaterialTheme.typography.headlineMedium,
-                                        textAlign = TextAlign.Center
-                                    )
-                                }
-                            }
-                        )
-                    }
-                ) { paddingValues ->
-                    val navController = rememberNavController()
-                    
-                    NavHost(
-                        navController = navController,
-                        startDestination = "home",
-                        modifier = Modifier.padding(paddingValues)
-                    ) {
+                val navController = rememberNavController()
+                
+                NavHost(
+                    navController = navController,
+                    startDestination = "home",
+                    modifier = Modifier.fillMaxSize()
+                ) {
                         composable("home") {
                             HomeScreen(
                                 onNavigateToFolders = { navController.navigate("folders") },
@@ -96,6 +67,7 @@ class MainActivity : ComponentActivity() {
                                 onNavigateToBackupSms = { navController.navigate("backupSms") },
                                 onNavigateToRestoreSms = { navController.navigate("restoreSms") },
                                 onNavigateToBackupApps = { navController.navigate("backupApps") },
+                                onNavigateToBackupMedia = { navController.navigate("backupMedia") },
                                 onNavigateToSettings = { navController.navigate("settings") }
                             )
                         }
@@ -147,6 +119,14 @@ class MainActivity : ComponentActivity() {
                                 } }
                             )
                         }
+                        composable("backupMedia") {
+                            BackupMediaScreen(
+                                onNavigateBack = { navController.popBackStack() },
+                                onNavigateHome = { navController.navigate("home") {
+                                    popUpTo("home") { inclusive = true }
+                                } }
+                            )
+                        }
                         composable("settings") {
                             SettingsScreen(
                                 onNavigateBack = { navController.popBackStack() },
@@ -155,7 +135,6 @@ class MainActivity : ComponentActivity() {
                                 } }
                             )
                         }
-                    }
                 }
             }
         }

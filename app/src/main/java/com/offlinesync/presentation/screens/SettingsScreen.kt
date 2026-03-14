@@ -308,7 +308,19 @@ data class AppStrings(
     val filterBySourceSim: String = "Filter by source SIM:",
     val allSourceSims: String = "All source SIMs",
     val selectTargetSim: String = "Select target SIM for restore:",
-    val backupApps: String = "Backup Apps"
+    val backupApps: String = "Backup Apps",
+    val backupMedia: String = "Backup Media",
+    val selectMediaTypes: String = "Select media types",
+    val images: String = "Images",
+    val videos: String = "Videos",
+    val audio: String = "Audio",
+    val supportedMessengers: String = "Supported messengers",
+    val backupResult: String = "Backup Result",
+    val totalFiles: String = "Total files",
+    val backedUpFiles: String = "Backed up files",
+    val skippedFiles: String = "Skipped files",
+    val backedUpSize: String = "Backed up size",
+    val sourceDetails: String = "Source details"
 )
 
 fun getStringsForLanguage(lang: String): AppStrings {
@@ -347,7 +359,19 @@ fun getStringsForLanguage(lang: String): AppStrings {
             filterBySourceSim = "Фильтр по исходной SIM:",
             allSourceSims = "Все исходные SIM",
             selectTargetSim = "Выберите целевую SIM для восстановления:",
-            backupApps = "Резервная копия приложений"
+            backupApps = "Резервная копия приложений",
+            backupMedia = "Резервная копия медиа",
+            selectMediaTypes = "Выберите типы медиа",
+            images = "Изображения",
+            videos = "Видео",
+            audio = "Аудио",
+            supportedMessengers = "Поддерживаемые мессенджеры",
+            backupResult = "Результат резервного копирования",
+            totalFiles = "Всего файлов",
+            backedUpFiles = "Скопировано файлов",
+            skippedFiles = "Пропущено файлов",
+            backedUpSize = "Скопировано",
+            sourceDetails = "Источники"
         )
         LanguageManager.LANGUAGE_UK -> AppStrings(
             settings = "Налаштування",
@@ -383,7 +407,19 @@ fun getStringsForLanguage(lang: String): AppStrings {
             filterBySourceSim = "Фільтр за SIM-картою:",
             allSourceSims = "Всі SIM-карти",
             selectTargetSim = "Оберіть цільову SIM для відновлення:",
-            backupApps = "Резервна копія додатків"
+            backupApps = "Резервна копія додатків",
+            backupMedia = "Резервна копія медіа",
+            selectMediaTypes = "Виберіть типи медіа",
+            images = "Зображення",
+            videos = "Відео",
+            audio = "Аудіо",
+            supportedMessengers = "Підтримувані месенджери",
+            backupResult = "Результат резервного копіювання",
+            totalFiles = "Всього файлів",
+            backedUpFiles = "Скопійовано файлів",
+            skippedFiles = "Пропущено файлів",
+            backedUpSize = "Скопійовано",
+            sourceDetails = "Джерела"
         )
         else -> AppStrings(
             settings = "Settings",
@@ -419,7 +455,19 @@ fun getStringsForLanguage(lang: String): AppStrings {
             filterBySourceSim = "Filter by source SIM:",
             allSourceSims = "All source SIMs",
             selectTargetSim = "Select target SIM for restore:",
-            backupApps = "Backup Apps"
+            backupApps = "Backup Apps",
+            backupMedia = "Backup Media",
+            selectMediaTypes = "Select media types",
+            images = "Images",
+            videos = "Videos",
+            audio = "Audio",
+            supportedMessengers = "Supported messengers",
+            backupResult = "Backup Result",
+            totalFiles = "Total files",
+            backedUpFiles = "Backed up files",
+            skippedFiles = "Skipped files",
+            backedUpSize = "Backed up size",
+            sourceDetails = "Source details"
         )
     }
 }
