@@ -315,6 +315,38 @@ class WebServer(private val context: Context, private val serverPort: Int = 8080
                     Log.d(TAG, "=== FILES: ${allItems.size} items ===")
                     call.respondText(json, ContentType.Application.Json)
                 }
+
+                // List directory contents (for file browser)
+                get("/browse") {
+                    val syncDir = getSyncDirectory()
+                    val pathParam = call.parameters["path"] ?: ""
+                    
+                    val currentDir = if (pathParam.isEmpty()) {
+                        syncDir
+                    } else {
+                        File(syncDir, pathParam)
+                    }
+                    
+                    if (!currentDir.exists() || !currentDir.isDirectory) {
+                        call.respondText("{\"error\":\"Invalid directory\",\"items\":[]}", ContentType.Application.Json)
+                        return@get
+                    }
+                    
+                    val items = currentDir.listFiles()?.map { file ->
+                        val size = if (file.isFile) file.length() else 0L
+                        "{\"name\":\"${file.name}\",\"isDirectory\":${file.isDirectory},\"size\":$size}"
+                    } ?: emptyList()
+                    
+                    val parentPath = if (pathParam.contains("/")) {
+                        pathParam.substringBeforeLast("/", "")
+                    } else {
+                        ""
+                    }
+                    
+                    val json = "{\"path\":\"$pathParam\",\"parent\":\"$parentPath\",\"items\":[${items.joinToString(",")}],\"total\":${items.size}}"
+                    Log.d(TAG, "=== BROWSE: $pathParam - ${items.size} items ===")
+                    call.respondText(json, ContentType.Application.Json)
+                }
             }
         }.start(wait = false)
         Log.d(TAG, "Ktor server started at ${address.hostAddress}:$serverPort")
