@@ -58,4 +58,9 @@
     <string name="skipped_files">Skipped files</string>
     <string name="backed_up_size">Backed up size</string>
     <string name="source_details">Source details</string>
+    <string name="grant_storage_permission">Grant Storage Permission</string>
+    <string name="storage_permission_required">Storage permission is required to backup media files</string>
+    <string name="not_enough_space">Not enough storage space. Need %1$s more free space.</string>
+    <string name="calculating_size">Calculating media size...</string>
+    <string name="starting_backup">Starting media backup... (%1$s to backup)</string>
 </resources>

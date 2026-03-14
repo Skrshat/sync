@@ -4,6 +4,7 @@ import android.content.Context
 import android.media.MediaScannerConnection
 import android.os.Build
 import android.os.Environment
+import android.os.StatFs
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -120,20 +121,106 @@ class BackupMediaViewModel @Inject constructor() : ViewModel() {
     }
 
     fun startBackup(context: Context, includeImages: Boolean = true, includeVideos: Boolean = true, includeAudio: Boolean = true) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Main) {
             _isLoading.value = true
             _backupResult.value = null
             try {
-                _backupStatus.value = "Starting media backup..."
-                val result = exportMedia(context, includeImages, includeVideos, includeAudio)
+                _backupStatus.value = "Calculating media size..."
+                
+                val extensions = mutableListOf<String>()
+                if (includeImages) {
+                    extensions.addAll(listOf("jpg", "jpeg", "png", "gif", "bmp", "webp", "heic", "heif", "svg", "raw", "cr2", "nef", "arw"))
+                }
+                if (includeVideos) {
+                    extensions.addAll(listOf("mp4", "mkv", "avi", "mov", "wmv", "flv", "webm", "3gp", "m4v", "ts"))
+                }
+                if (includeAudio) {
+                    extensions.addAll(listOf("mp3", "wav", "ogg", "m4a", "aac", "flac", "wma", "opus", "aiff"))
+                }
+                
+                val totalBackupSize = withContext(Dispatchers.IO) { calculateTotalSize(extensions) }
+                val availableSpace = withContext(Dispatchers.IO) { getAvailableSpace() }
+                
+                Log.d(TAG, "Total backup size: ${formatSize(totalBackupSize)}, Available: ${formatSize(availableSpace)}")
+                
+                if (totalBackupSize == 0L) {
+                    _backupStatus.value = "No media files found."
+                    _isLoading.value = false
+                    return@launch
+                }
+                
+                if (totalBackupSize > availableSpace) {
+                    val needed = formatSize(totalBackupSize - availableSpace)
+                    _backupStatus.value = "Not enough storage space. Need $needed more free space."
+                    _isLoading.value = false
+                    return@launch
+                }
+                
+                _backupStatus.value = "Starting media backup... (${formatSize(totalBackupSize)} to backup)"
+                val result = withContext(Dispatchers.IO) { 
+                    exportMedia(context, includeImages, includeVideos, includeAudio) 
+                }
                 _backupResult.value = result
-                _backupStatus.value = "Backup complete: ${result.backedUpFiles} files backed up (${formatSize(result.backedUpSize)})"
+                val msg = if (result.totalFiles == 0) {
+                    "No media files found."
+                } else {
+                    "Backup complete: ${result.backedUpFiles}/${result.totalFiles} files (${formatSize(result.backedUpSize)})"
+                }
+                _backupStatus.value = msg
             } catch (e: Exception) {
-                Log.e(TAG, "Error backing up media: ${e.message}")
+                Log.e(TAG, "Error backing up media: ${e.message}", e)
                 _backupStatus.value = "Error: ${e.message}"
             } finally {
                 _isLoading.value = false
             }
+        }
+    }
+    
+    private fun calculateTotalSize(extensions: List<String>): Long {
+        var totalSize = 0L
+        val externalStorage = Environment.getExternalStorageDirectory()
+        
+        val allFolders = STANDARD_IMAGE_FOLDERS + STANDARD_VIDEO_FOLDERS + STANDARD_AUDIO_FOLDERS
+        
+        for (folder in allFolders.toSet()) {
+            val mediaDir = Environment.getExternalStoragePublicDirectory(folder)
+            if (mediaDir.exists() && mediaDir.isDirectory) {
+                try {
+                    val files = mediaDir.walkTopDown()
+                        .filter { it.isFile && extensions.any { ext -> it.extension.equals(ext, ignoreCase = true) } }
+                    totalSize += files.sumOf { it.length() }
+                } catch (e: Exception) {
+                    Log.w(TAG, "Error scanning $folder: ${e.message}")
+                }
+            }
+        }
+        
+        for (messenger in MESSENGER_CONFIGS) {
+            for (relativePath in messenger.folders) {
+                val sourceDir = File(externalStorage, relativePath)
+                if (sourceDir.exists() && sourceDir.isDirectory) {
+                    try {
+                        val files = sourceDir.walkTopDown()
+                            .filter { it.isFile && extensions.any { ext -> it.extension.equals(ext, ignoreCase = true) } }
+                        totalSize += files.sumOf { it.length() }
+                    } catch (e: Exception) {
+                        Log.w(TAG, "Error scanning $relativePath: ${e.message}")
+                    }
+                }
+            }
+        }
+        
+        return totalSize
+    }
+    
+    private fun getAvailableSpace(): Long {
+        return try {
+            val path = Environment.getExternalStorageDirectory()
+            val stat = StatFs(path.absolutePath)
+            stat.availableBlocksLong * stat.blockSizeLong
+        } catch (e: Exception) {
+            Log.e(TAG, "Error getting available space: ${e.message}")
+            0L
         }
     }
 
@@ -161,22 +248,25 @@ class BackupMediaViewModel @Inject constructor() : ViewModel() {
 
         val extensions = mutableListOf<String>()
         if (includeImages) {
-            extensions.addAll(listOf("jpg", "jpeg", "png", "gif", "bmp", "webp", "heic", "heif", "svg"))
+            extensions.addAll(listOf("jpg", "jpeg", "png", "gif", "bmp", "webp", "heic", "heif", "svg", "raw", "cr2", "nef", "arw"))
         }
         if (includeVideos) {
-            extensions.addAll(listOf("mp4", "mkv", "avi", "mov", "wmv", "flv", "webm", "3gp", "m4v"))
+            extensions.addAll(listOf("mp4", "mkv", "avi", "mov", "wmv", "flv", "webm", "3gp", "m4v", "ts"))
         }
         if (includeAudio) {
-            extensions.addAll(listOf("mp3", "wav", "ogg", "m4a", "aac", "flac", "wma", "opus"))
+            extensions.addAll(listOf("mp3", "wav", "ogg", "m4a", "aac", "flac", "wma", "opus", "aiff"))
         }
 
+        Log.d(TAG, "Starting backup with extensions: $extensions")
         val externalStorage = Environment.getExternalStorageDirectory()
+        Log.d(TAG, "External storage: ${externalStorage.absolutePath}")
         
         _backupStatus.value = "Scanning standard folders..."
         
         if (includeImages) {
             for (folder in STANDARD_IMAGE_FOLDERS) {
                 val mediaDir = Environment.getExternalStoragePublicDirectory(folder)
+                Log.d(TAG, "Processing image folder: ${mediaDir.absolutePath}")
                 val (count, backed, skipped, size, backedSize) = scanAndBackupDirectory(
                     mediaDir, File(backupDir, folder), extensions, "Images"
                 )
@@ -192,6 +282,7 @@ class BackupMediaViewModel @Inject constructor() : ViewModel() {
         if (includeVideos) {
             for (folder in STANDARD_VIDEO_FOLDERS) {
                 val mediaDir = Environment.getExternalStoragePublicDirectory(folder)
+                Log.d(TAG, "Processing video folder: ${mediaDir.absolutePath}")
                 val (count, backed, skipped, size, backedSize) = scanAndBackupDirectory(
                     mediaDir, File(backupDir, folder), extensions, "Videos"
                 )
@@ -207,6 +298,7 @@ class BackupMediaViewModel @Inject constructor() : ViewModel() {
         if (includeAudio) {
             for (folder in STANDARD_AUDIO_FOLDERS) {
                 val mediaDir = Environment.getExternalStoragePublicDirectory(folder)
+                Log.d(TAG, "Processing audio folder: ${mediaDir.absolutePath}")
                 val (count, backed, skipped, size, backedSize) = scanAndBackupDirectory(
                     mediaDir, File(backupDir, folder), extensions, "Audio"
                 )
@@ -270,7 +362,10 @@ class BackupMediaViewModel @Inject constructor() : ViewModel() {
         extensions: List<String>,
         category: String
     ): BackupStats {
+        Log.d(TAG, "Scanning directory: ${sourceDir.absolutePath}, category: $category")
+        
         if (!sourceDir.exists() || !sourceDir.isDirectory) {
+            Log.d(TAG, "Directory does not exist or is not a directory: ${sourceDir.absolutePath}")
             return BackupStats(0, 0, 0, 0, 0)
         }
 
@@ -286,6 +381,7 @@ class BackupMediaViewModel @Inject constructor() : ViewModel() {
                 .toList()
 
             totalCount = files.size
+            Log.d(TAG, "Found $totalCount files in ${sourceDir.absolutePath}")
 
             for (file in files) {
                 try {
@@ -304,6 +400,7 @@ class BackupMediaViewModel @Inject constructor() : ViewModel() {
                     copyFile(file, destFile)
                     backedUpCount++
                     backedUpSize += file.length()
+                    Log.d(TAG, "Backed up: ${file.name}")
 
                 } catch (e: Exception) {
                     Log.w(TAG, "Failed to backup file: ${file.absolutePath}, error: ${e.message}")

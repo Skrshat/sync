@@ -320,7 +320,12 @@ data class AppStrings(
     val backedUpFiles: String = "Backed up files",
     val skippedFiles: String = "Skipped files",
     val backedUpSize: String = "Backed up size",
-    val sourceDetails: String = "Source details"
+    val sourceDetails: String = "Source details",
+    val grantStoragePermission: String = "Grant Storage Permission",
+    val storagePermissionRequired: String = "Storage permission is required to backup media files",
+    val notEnoughSpace: String = "Not enough storage space",
+    val calculatingSize: String = "Calculating media size...",
+    val startingBackup: String = "Starting media backup"
 )
 
 fun getStringsForLanguage(lang: String): AppStrings {
@@ -371,7 +376,12 @@ fun getStringsForLanguage(lang: String): AppStrings {
             backedUpFiles = "Скопировано файлов",
             skippedFiles = "Пропущено файлов",
             backedUpSize = "Скопировано",
-            sourceDetails = "Источники"
+            sourceDetails = "Источники",
+            grantStoragePermission = "Предоставить разрешение на хранилище",
+            storagePermissionRequired = "Разрешение на хранилище требуется для резервного копирования медиафайлов",
+            notEnoughSpace = "Недостаточно места",
+            calculatingSize = "Расчёт размера медиафайлов...",
+            startingBackup = "Запуск резервного копирования"
         )
         LanguageManager.LANGUAGE_UK -> AppStrings(
             settings = "Налаштування",
@@ -419,7 +429,12 @@ fun getStringsForLanguage(lang: String): AppStrings {
             backedUpFiles = "Скопійовано файлів",
             skippedFiles = "Пропущено файлів",
             backedUpSize = "Скопійовано",
-            sourceDetails = "Джерела"
+            sourceDetails = "Джерела",
+            grantStoragePermission = "Надати дозвіл на сховище",
+            storagePermissionRequired = "Дозвіл на сховище потрібен для резервного копіювання медіафайлів",
+            notEnoughSpace = "Недостатньо місця",
+            calculatingSize = "Розрахунок розміру медіафайлів...",
+            startingBackup = "Запуск резервного копіювання"
         )
         else -> AppStrings(
             settings = "Settings",
@@ -467,7 +482,12 @@ fun getStringsForLanguage(lang: String): AppStrings {
             backedUpFiles = "Backed up files",
             skippedFiles = "Skipped files",
             backedUpSize = "Backed up size",
-            sourceDetails = "Source details"
+            sourceDetails = "Source details",
+            grantStoragePermission = "Grant Storage Permission",
+            storagePermissionRequired = "Storage permission is required to backup media files",
+            notEnoughSpace = "Not enough storage space",
+            calculatingSize = "Calculating media size...",
+            startingBackup = "Starting media backup"
         )
     }
 }

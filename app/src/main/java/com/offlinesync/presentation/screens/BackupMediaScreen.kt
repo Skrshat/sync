@@ -1,5 +1,13 @@
 package com.offlinesync.presentation.screens
 
+import android.Manifest
+import android.content.Intent
+import android.net.Uri
+import android.os.Build
+import android.os.Environment
+import android.provider.Settings
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -56,6 +64,36 @@ fun BackupMediaScreen(
     var includeImages by remember { mutableStateOf(true) }
     var includeVideos by remember { mutableStateOf(true) }
     var includeAudio by remember { mutableStateOf(true) }
+    
+    fun checkStoragePermission(): Boolean {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            Environment.isExternalStorageManager()
+        } else {
+            true
+        }
+    }
+    
+    var hasStoragePermission by remember { mutableStateOf(checkStoragePermission()) }
+
+    val requestPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) {
+        hasStoragePermission = checkStoragePermission()
+    }
+
+    fun requestStoragePermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            try {
+                val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION).apply {
+                    data = Uri.parse("package:${context.packageName}")
+                }
+                requestPermissionLauncher.launch(intent)
+            } catch (e: Exception) {
+                val intent = Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION)
+                requestPermissionLauncher.launch(intent)
+            }
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -154,14 +192,32 @@ fun BackupMediaScreen(
                 }
             }
 
+            if (!hasStoragePermission) {
+                Button(
+                    onClick = { requestStoragePermission() },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(strings.grantStoragePermission)
+                }
+                Text(
+                    text = strings.storagePermissionRequired,
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.padding(top = 8.dp)
+                )
+            }
+
             Button(
                 onClick = { 
-                    viewModel.startBackup(
-                        context, 
-                        includeImages = includeImages, 
-                        includeVideos = includeVideos, 
-                        includeAudio = includeAudio
-                    ) 
+                    if (hasStoragePermission) {
+                        viewModel.startBackup(
+                            context, 
+                            includeImages = includeImages, 
+                            includeVideos = includeVideos, 
+                            includeAudio = includeAudio
+                        )
+                    } else {
+                        requestStoragePermission()
+                    }
                 },
                 modifier = Modifier.fillMaxWidth(),
                 enabled = !isLoading && (includeImages || includeVideos || includeAudio)
