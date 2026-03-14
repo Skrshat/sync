@@ -330,7 +330,23 @@ data class AppStrings(
     val externalStorage: String = "External storage (USB)",
     val internalStorage: String = "Internal storage",
     val selectFolder: String = "Select folder",
-    val selectFolderHint: String = "Select a folder on external storage or USB drive"
+    val selectFolderHint: String = "Select a folder on external storage or USB drive",
+    val ftpServer: String = "FTP Server",
+    val ftpServerInfo: String = "FTP server allows you to transfer files directly to your computer over WiFi",
+    val ftpServerWifiNote: String = "Both devices must be on the same WiFi network",
+    val ftpServerAddress: String = "Server address",
+    val rootDirectory: String = "Root directory",
+    val availableFolders: String = "Available folders",
+    val connectedClients: String = "Connected clients",
+    val startServer: String = "Start FTP Server",
+    val stopServer: String = "Stop FTP Server",
+    val copyUrl: String = "Copy URL",
+    val copy: String = "Copy",
+    val howToConnect: String = "How to connect",
+    val ftpStep1: String = "Connect your phone to WiFi",
+    val ftpStep2: String = "Start FTP server in this app",
+    val ftpStep3: String = "Open file manager on your computer",
+    val ftpStep4: String = "Enter the FTP address shown above"
 )
 
 fun getStringsForLanguage(lang: String): AppStrings {
@@ -391,7 +407,23 @@ fun getStringsForLanguage(lang: String): AppStrings {
             externalStorage = "Внешний носитель (USB)",
             internalStorage = "Внутренняя память",
             selectFolder = "Выбрать папку",
-            selectFolderHint = "Выберите папку на внешнем носителе или USB-диске"
+            selectFolderHint = "Выберите папку на внешнем носителе или USB-диске",
+            ftpServer = "FTP сервер",
+            ftpServerInfo = "FTP сервер позволяет передавать файлы напрямую на компьютер по WiFi",
+            ftpServerWifiNote = "Оба устройства должны быть в одной WiFi сети",
+            ftpServerAddress = "Адрес сервера",
+            rootDirectory = "Корневая папка",
+            availableFolders = "Доступные папки",
+            connectedClients = "Подключённые клиенты",
+            startServer = "Запустить FTP сервер",
+            stopServer = "Остановить FTP сервер",
+            copyUrl = "Копировать URL",
+            copy = "Копировать",
+            howToConnect = "Как подключиться",
+            ftpStep1 = "Подключите телефон к WiFi",
+            ftpStep2 = "Запустите FTP сервер в этом приложении",
+            ftpStep3 = "Откройте файловый менеджер на компьютере",
+            ftpStep4 = "Введите FTP адрес, показанный выше"
         )
         LanguageManager.LANGUAGE_UK -> AppStrings(
             settings = "Налаштування",
@@ -449,7 +481,23 @@ fun getStringsForLanguage(lang: String): AppStrings {
             externalStorage = "Зовнішній носій (USB)",
             internalStorage = "Внутрішня пам'ять",
             selectFolder = "Обрати папку",
-            selectFolderHint = "Оберіть папку на зовнішньому носії або USB-диску"
+            selectFolderHint = "Оберіть папку на зовнішньому носії або USB-диску",
+            ftpServer = "FTP сервер",
+            ftpServerInfo = "FTP сервер дозволяє передавати файли напряму на комп'ютер по WiFi",
+            ftpServerWifiNote = "Обидва пристрої мають бути в одній WiFi мережі",
+            ftpServerAddress = "Адреса сервера",
+            rootDirectory = "Коренева папка",
+            availableFolders = "Доступні папки",
+            connectedClients = "Підключені клієнти",
+            startServer = "Запустити FTP сервер",
+            stopServer = "Зупинити FTP сервер",
+            copyUrl = "Копіювати URL",
+            copy = "Копіювати",
+            howToConnect = "Як підключитися",
+            ftpStep1 = "Підключіть телефон до WiFi",
+            ftpStep2 = "Запустіть FTP сервер у цьому додатку",
+            ftpStep3 = "Відкрийте файловий менеджер на комп'ютері",
+            ftpStep4 = "Введіть FTP адресу, показану вище"
         )
         else -> AppStrings(
             settings = "Settings",
@@ -507,7 +555,22 @@ fun getStringsForLanguage(lang: String): AppStrings {
             externalStorage = "External storage (USB)",
             internalStorage = "Internal storage",
             selectFolder = "Select folder",
-            selectFolderHint = "Select a folder on external storage or USB drive"
+            selectFolderHint = "Select a folder on external storage or USB drive",
+            ftpServer = "FTP Server",
+            ftpServerInfo = "FTP server allows you to transfer files directly to your computer over WiFi",
+            ftpServerWifiNote = "Both devices must be on the same WiFi network",
+            ftpServerAddress = "Server address",
+            rootDirectory = "Root directory",
+            connectedClients = "Connected clients",
+            startServer = "Start FTP Server",
+            stopServer = "Stop FTP Server",
+            copyUrl = "Copy URL",
+            copy = "Copy",
+            howToConnect = "How to connect",
+            ftpStep1 = "Connect your phone to WiFi",
+            ftpStep2 = "Start FTP server in this app",
+            ftpStep3 = "Open file manager on your computer",
+            ftpStep4 = "Enter the FTP address shown above"
         )
     }
 }
