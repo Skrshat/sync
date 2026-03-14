@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
@@ -88,7 +89,7 @@ fun RestoreSmsScreen(
                 },
                 actions = {
                     IconButton(onClick = onNavigateHome) {
-                        Icon(Icons.Default.Home, contentDescription = "Home")
+                        Icon(Icons.Default.Home, contentDescription = "Home", modifier = Modifier.size(48.dp))
                     }
                 }
             )

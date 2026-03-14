@@ -504,14 +504,6 @@ class OfflineSyncGUI:
                 if r.status_code == 200:
                     apps_data = r.json()
                     apps_list = apps_data.get('apps', [])
-                    
-                    apps_file = Path(folder) / "installed_apps.txt"
-                    with open(apps_file, 'w', encoding='utf-8') as f:
-                        f.write(self.lang.t("installed_apps") + "\n")
-                        f.write("=" * 40 + "\n\n")
-                        for app in sorted(apps_list, key=lambda x: x.get('name', '')):
-                            f.write(f"{app.get('name', '')} ({app.get('package', '')})\n")
-                    
                     self.log(f"{self.lang.t('saved_apps')}: {len(apps_list)}")
             except Exception as e:
                 self.log(f"{self.lang.t('error_getting_apps')}: {e}")

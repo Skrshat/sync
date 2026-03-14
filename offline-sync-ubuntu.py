@@ -129,12 +129,6 @@ class OfflineSyncClient:
         """Сохранение списка приложений в файл"""
         apps = self.get_installed_apps()
         if apps:
-            apps_file = self.sync_folder / "installed_apps.txt"
-            with open(apps_file, 'w', encoding='utf-8') as f:
-                f.write("Список установленных приложений\n")
-                f.write("=" * 40 + "\n\n")
-                for app in sorted(apps, key=lambda x: x.get('name', '')):
-                    f.write(f"{app.get('name', '')} ({app.get('package', '')})\n")
             print(f"Сохранено приложений: {len(apps)}")
             return True
         return False

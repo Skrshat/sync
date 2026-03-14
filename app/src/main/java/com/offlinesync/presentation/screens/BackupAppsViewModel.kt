@@ -44,6 +44,7 @@ class BackupAppsViewModel @Inject constructor() : ViewModel() {
 
     companion object {
         private const val TAG = "BackupAppsViewModel"
+        private val EXCLUDED_PREFIXES = listOf("com.google", "com.android", "android", "com.qualcomm", "com.sec")
     }
 
     fun startBackup(context: Context) {
@@ -77,6 +78,12 @@ class BackupAppsViewModel @Inject constructor() : ViewModel() {
 
         for (packageInfo in packages) {
             try {
+                val packageName = packageInfo.packageName
+                
+                if (EXCLUDED_PREFIXES.any { packageName.startsWith(it) }) {
+                    continue
+                }
+
                 val appInfo = packageInfo.applicationInfo
                 val isSystemApp = (appInfo?.flags ?: 0) and ApplicationInfo.FLAG_SYSTEM != 0
 

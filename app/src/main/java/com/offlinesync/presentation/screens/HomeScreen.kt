@@ -72,7 +72,9 @@ fun HomeScreen(
                     Icon(
                         imageVector = Icons.Default.Home,
                         contentDescription = "Home",
-                        modifier = Modifier.padding(start = 16.dp)
+                        modifier = Modifier
+                            .padding(start = 16.dp)
+                            .size(48.dp)
                     )
                 }
             )

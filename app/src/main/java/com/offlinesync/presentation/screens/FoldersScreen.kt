@@ -38,11 +38,14 @@ fun FoldersScreen(
     onNavigateBack: () -> Unit = {},
     onNavigateHome: () -> Unit = {}
 ) {
+    val offlineSyncPath = remember {
+        File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "OfflineSync")
+    }
+    
+    var currentPath by remember { mutableStateOf(offlineSyncPath) }
     val rootPath = remember {
         Environment.getExternalStorageDirectory()
     }
-    
-    var currentPath by remember { mutableStateOf(rootPath) }
     val files = remember(currentPath) {
         currentPath.listFiles()?.sortedWith(
             compareBy({ !it.isDirectory }, { it.name.lowercase() })
