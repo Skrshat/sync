@@ -41,6 +41,10 @@ class WebServer(private val context: Context, private val serverPort: Int = 8080
         return syncDir
     }
 
+    private fun getRootDirectory(): File {
+        return Environment.getExternalStorageDirectory()
+    }
+
     fun start(address: InetAddress) {
         if (server != null) {
             Log.d(TAG, "Server already running, stopping before restarting.")
@@ -253,32 +257,8 @@ class WebServer(private val context: Context, private val serverPort: Int = 8080
                     }
                     Log.d(TAG, "=== DECODED: $decodedPath ===")
                     
-                    val syncDir = getSyncDirectory()
-                    
-                    // List all files recursively
-                    fun listAllFiles(dir: File): List<File> {
-                        val files = mutableListOf<File>()
-                        dir.listFiles()?.forEach { f ->
-                            if (f.isFile) files.add(f)
-                            else if (f.isDirectory) files.addAll(listAllFiles(f))
-                        }
-                        return files
-                    }
-                    val allFiles = listAllFiles(syncDir)
-                    Log.d(TAG, "=== Total files: ${allFiles.size} ===")
-                    
-                    // Find file
-                    var targetFile: File? = null
-                    
-                    val directFile = File(syncDir, decodedPath)
-                    if (directFile.exists()) {
-                        targetFile = directFile
-                    }
-                    
-                    if (targetFile == null) {
-                        val searchName = decodedPath.substringAfterLast("/")
-                        targetFile = allFiles.find { it.name == searchName }
-                    }
+                    val rootDir = getRootDirectory()
+                    val targetFile = File(rootDir, decodedPath)
                     
                     if (targetFile != null && targetFile.exists()) {
                         Log.d(TAG, "=== FOUND: ${targetFile.absolutePath} ===")
@@ -318,13 +298,13 @@ class WebServer(private val context: Context, private val serverPort: Int = 8080
 
                 // List directory contents (for file browser)
                 get("/browse") {
-                    val syncDir = getSyncDirectory()
+                    val rootDir = getRootDirectory()
                     val pathParam = call.parameters["path"] ?: ""
                     
                     val currentDir = if (pathParam.isEmpty()) {
-                        syncDir
+                        rootDir
                     } else {
-                        File(syncDir, pathParam)
+                        File(rootDir, pathParam)
                     }
                     
                     if (!currentDir.exists() || !currentDir.isDirectory) {
@@ -356,8 +336,8 @@ class WebServer(private val context: Context, private val serverPort: Int = 8080
                         return@delete
                     }
                     
-                    val syncDir = getSyncDirectory()
-                    val targetFile = File(syncDir, pathParam)
+                    val rootDir = getRootDirectory()
+                    val targetFile = File(rootDir, pathParam)
                     
                     if (!targetFile.exists()) {
                         call.respondText("{\"error\":\"File not found\",\"success\":false}", ContentType.Application.Json)
