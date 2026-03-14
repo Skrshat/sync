@@ -41,11 +41,17 @@ class BackupMediaViewModel @Inject constructor() : ViewModel() {
     private val _backupProgress = MutableStateFlow(0)
     val backupProgress: StateFlow<Int> = _backupProgress.asStateFlow()
 
+    private val _estimatedTimeRemaining = MutableStateFlow("")
+    val estimatedTimeRemaining: StateFlow<String> = _estimatedTimeRemaining.asStateFlow()
+
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
     private val _backupResult = MutableStateFlow<MediaBackupResult?>(null)
     val backupResult: StateFlow<MediaBackupResult?> = _backupResult.asStateFlow()
+
+    private var backupStartTime = 0L
+    private var totalFilesToBackup = 0
 
     companion object {
         private const val TAG = "BackupMediaViewModel"
@@ -157,6 +163,11 @@ class BackupMediaViewModel @Inject constructor() : ViewModel() {
                 }
                 
                 _backupStatus.value = "Starting media backup... (${formatSize(totalBackupSize)} to backup)"
+                backupStartTime = System.currentTimeMillis()
+                totalFilesToBackup = withContext(Dispatchers.IO) { countTotalFiles(extensions) }
+                _backupProgress.value = 0
+                _estimatedTimeRemaining.value = "Calculating..."
+                
                 val result = withContext(Dispatchers.IO) { 
                     exportMedia(context, includeImages, includeVideos, includeAudio) 
                 }
@@ -223,6 +234,43 @@ class BackupMediaViewModel @Inject constructor() : ViewModel() {
             0L
         }
     }
+    
+    private fun countTotalFiles(extensions: List<String>): Int {
+        var count = 0
+        val externalStorage = Environment.getExternalStorageDirectory()
+        
+        val allFolders = STANDARD_IMAGE_FOLDERS + STANDARD_VIDEO_FOLDERS + STANDARD_AUDIO_FOLDERS
+        
+        for (folder in allFolders.toSet()) {
+            val mediaDir = Environment.getExternalStoragePublicDirectory(folder)
+            if (mediaDir.exists() && mediaDir.isDirectory) {
+                try {
+                    count += mediaDir.walkTopDown()
+                        .filter { it.isFile && extensions.any { ext -> it.extension.equals(ext, ignoreCase = true) } }
+                        .count()
+                } catch (e: Exception) {
+                    Log.w(TAG, "Error counting $folder: ${e.message}")
+                }
+            }
+        }
+        
+        for (messenger in MESSENGER_CONFIGS) {
+            for (relativePath in messenger.folders) {
+                val sourceDir = File(externalStorage, relativePath)
+                if (sourceDir.exists() && sourceDir.isDirectory) {
+                    try {
+                        count += sourceDir.walkTopDown()
+                            .filter { it.isFile && extensions.any { ext -> it.extension.equals(ext, ignoreCase = true) } }
+                            .count()
+                    } catch (e: Exception) {
+                        Log.w(TAG, "Error counting $relativePath: ${e.message}")
+                    }
+                }
+            }
+        }
+        
+        return count
+    }
 
     private suspend fun exportMedia(
         context: Context,
@@ -263,6 +311,8 @@ class BackupMediaViewModel @Inject constructor() : ViewModel() {
         
         _backupStatus.value = "Scanning standard folders..."
         
+        var processedFiles = 0
+        
         if (includeImages) {
             for (folder in STANDARD_IMAGE_FOLDERS) {
                 val mediaDir = Environment.getExternalStoragePublicDirectory(folder)
@@ -276,6 +326,9 @@ class BackupMediaViewModel @Inject constructor() : ViewModel() {
                 totalSize += size
                 backedUpSize += backedSize
                 if (count > 0) sourceDetails[folder] = count
+                
+                processedFiles += backed + skipped
+                updateProgress(processedFiles)
             }
         }
 
@@ -292,6 +345,9 @@ class BackupMediaViewModel @Inject constructor() : ViewModel() {
                 totalSize += size
                 backedUpSize += backedSize
                 if (count > 0) sourceDetails[folder] = count
+                
+                processedFiles += backed + skipped
+                updateProgress(processedFiles)
             }
         }
 
@@ -308,6 +364,9 @@ class BackupMediaViewModel @Inject constructor() : ViewModel() {
                 totalSize += size
                 backedUpSize += backedSize
                 if (count > 0) sourceDetails[folder] = count
+                
+                processedFiles += backed + skipped
+                updateProgress(processedFiles)
             }
         }
 
@@ -329,6 +388,9 @@ class BackupMediaViewModel @Inject constructor() : ViewModel() {
                     totalSize += size
                     backedUpSize += backedSize
                     if (count > 0) sourceDetails["${messenger.name}/$subDirName"] = count
+                    
+                    processedFiles += backed + skipped
+                    updateProgress(processedFiles)
                 }
             }
 
@@ -343,6 +405,9 @@ class BackupMediaViewModel @Inject constructor() : ViewModel() {
                 totalSize += size
                 backedUpSize += backedSize
                 if (count > 0) sourceDetails["${messenger.name}/AndroidData"] = count
+                
+                processedFiles += backed + skipped
+                updateProgress(processedFiles)
             }
         }
 
@@ -428,6 +493,30 @@ class BackupMediaViewModel @Inject constructor() : ViewModel() {
             size >= 1_000_000 -> String.format(Locale.getDefault(), "%.2f MB", size / 1_000_000.0)
             size >= 1_000 -> String.format(Locale.getDefault(), "%.2f KB", size / 1_000.0)
             else -> "$size B"
+        }
+    }
+
+    private fun updateProgress(processedFiles: Int) {
+        if (totalFilesToBackup > 0) {
+            val progress = (processedFiles * 100) / totalFilesToBackup
+            _backupProgress.value = progress.coerceIn(0, 100)
+            
+            val elapsedTime = System.currentTimeMillis() - backupStartTime
+            if (processedFiles > 0 && elapsedTime > 0) {
+                val timePerFile = elapsedTime / processedFiles
+                val remainingFiles = totalFilesToBackup - processedFiles
+                val remainingTimeMs = remainingFiles * timePerFile
+                _estimatedTimeRemaining.value = formatTime(remainingTimeMs)
+            }
+        }
+    }
+
+    private fun formatTime(milliseconds: Long): String {
+        val seconds = milliseconds / 1000
+        return when {
+            seconds < 60 -> "$seconds sec"
+            seconds < 3600 -> "${seconds / 60} min ${seconds % 60} sec"
+            else -> "${seconds / 3600} h ${(seconds % 3600) / 60} min"
         }
     }
 

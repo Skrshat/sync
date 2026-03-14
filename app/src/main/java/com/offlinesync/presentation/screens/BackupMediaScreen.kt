@@ -60,6 +60,8 @@ fun BackupMediaScreen(
     val backupStatus by viewModel.backupStatus.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val backupResult by viewModel.backupResult.collectAsState()
+    val backupProgress by viewModel.backupProgress.collectAsState()
+    val estimatedTimeRemaining by viewModel.estimatedTimeRemaining.collectAsState()
 
     var includeImages by remember { mutableStateOf(true) }
     var includeVideos by remember { mutableStateOf(true) }
@@ -186,9 +188,18 @@ fun BackupMediaScreen(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    CircularProgressIndicator()
-                    Spacer(modifier = Modifier.height(16.dp))
+                    CircularProgressIndicator(progress = { backupProgress / 100f })
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(text = "$backupProgress%")
+                    Spacer(modifier = Modifier.height(8.dp))
                     Text(text = backupStatus)
+                    if (estimatedTimeRemaining.isNotEmpty()) {
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = "Estimated time remaining: $estimatedTimeRemaining",
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
                 }
             }
 
