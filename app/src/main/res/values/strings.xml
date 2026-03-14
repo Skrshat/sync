@@ -63,4 +63,9 @@
     <string name="not_enough_space">Not enough storage space. Need %1$s more free space.</string>
     <string name="calculating_size">Calculating media size...</string>
     <string name="starting_backup">Starting media backup... (%1$s to backup)</string>
+    <string name="backup_destination">Backup destination</string>
+    <string name="external_storage">External storage (USB)</string>
+    <string name="internal_storage">Internal storage</string>
+    <string name="select_folder">Select folder</string>
+    <string name="select_folder_hint">Select a folder on external storage or USB drive</string>
 </resources>

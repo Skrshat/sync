@@ -325,7 +325,12 @@ data class AppStrings(
     val storagePermissionRequired: String = "Storage permission is required to backup media files",
     val notEnoughSpace: String = "Not enough storage space",
     val calculatingSize: String = "Calculating media size...",
-    val startingBackup: String = "Starting media backup"
+    val startingBackup: String = "Starting media backup",
+    val backupDestination: String = "Backup destination",
+    val externalStorage: String = "External storage (USB)",
+    val internalStorage: String = "Internal storage",
+    val selectFolder: String = "Select folder",
+    val selectFolderHint: String = "Select a folder on external storage or USB drive"
 )
 
 fun getStringsForLanguage(lang: String): AppStrings {
@@ -381,7 +386,12 @@ fun getStringsForLanguage(lang: String): AppStrings {
             storagePermissionRequired = "Разрешение на хранилище требуется для резервного копирования медиафайлов",
             notEnoughSpace = "Недостаточно места",
             calculatingSize = "Расчёт размера медиафайлов...",
-            startingBackup = "Запуск резервного копирования"
+            startingBackup = "Запуск резервного копирования",
+            backupDestination = "Место сохранения",
+            externalStorage = "Внешний носитель (USB)",
+            internalStorage = "Внутренняя память",
+            selectFolder = "Выбрать папку",
+            selectFolderHint = "Выберите папку на внешнем носителе или USB-диске"
         )
         LanguageManager.LANGUAGE_UK -> AppStrings(
             settings = "Налаштування",
@@ -434,7 +444,12 @@ fun getStringsForLanguage(lang: String): AppStrings {
             storagePermissionRequired = "Дозвіл на сховище потрібен для резервного копіювання медіафайлів",
             notEnoughSpace = "Недостатньо місця",
             calculatingSize = "Розрахунок розміру медіафайлів...",
-            startingBackup = "Запуск резервного копіювання"
+            startingBackup = "Запуск резервного копіювання",
+            backupDestination = "Місце збереження",
+            externalStorage = "Зовнішній носій (USB)",
+            internalStorage = "Внутрішня пам'ять",
+            selectFolder = "Обрати папку",
+            selectFolderHint = "Оберіть папку на зовнішньому носії або USB-диску"
         )
         else -> AppStrings(
             settings = "Settings",
@@ -487,7 +502,12 @@ fun getStringsForLanguage(lang: String): AppStrings {
             storagePermissionRequired = "Storage permission is required to backup media files",
             notEnoughSpace = "Not enough storage space",
             calculatingSize = "Calculating media size...",
-            startingBackup = "Starting media backup"
+            startingBackup = "Starting media backup",
+            backupDestination = "Backup destination",
+            externalStorage = "External storage (USB)",
+            internalStorage = "Internal storage",
+            selectFolder = "Select folder",
+            selectFolderHint = "Select a folder on external storage or USB drive"
         )
     }
 }

@@ -44,6 +44,9 @@ class BackupMediaViewModel @Inject constructor() : ViewModel() {
     private val _estimatedTimeRemaining = MutableStateFlow("")
     val estimatedTimeRemaining: StateFlow<String> = _estimatedTimeRemaining.asStateFlow()
 
+    private val _selectedBackupPath = MutableStateFlow<String?>(null)
+    val selectedBackupPath: StateFlow<String?> = _selectedBackupPath.asStateFlow()
+
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
@@ -55,6 +58,10 @@ class BackupMediaViewModel @Inject constructor() : ViewModel() {
 
     companion object {
         private const val TAG = "BackupMediaViewModel"
+        
+        const val IS_PREMIUM_VERSION = true
+        
+        val DEFAULT_BACKUP_PATH = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "OfflineSync/Media")
 
         private val STANDARD_IMAGE_FOLDERS = listOf(
             Environment.DIRECTORY_DCIM,
@@ -124,6 +131,14 @@ class BackupMediaViewModel @Inject constructor() : ViewModel() {
                 "WeChat/Media"
             ))
         )
+    }
+
+    fun setBackupPath(path: String?) {
+        _selectedBackupPath.value = path
+    }
+
+    fun getBackupDestination(): File {
+        return _selectedBackupPath.value?.let { File(it) } ?: DEFAULT_BACKUP_PATH
     }
 
     fun startBackup(context: Context, includeImages: Boolean = true, includeVideos: Boolean = true, includeAudio: Boolean = true) {
@@ -278,7 +293,7 @@ class BackupMediaViewModel @Inject constructor() : ViewModel() {
         includeVideos: Boolean,
         includeAudio: Boolean
     ): MediaBackupResult = withContext(Dispatchers.IO) {
-        val syncDir = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "OfflineSync/Media")
+        val syncDir = getBackupDestination()
         if (!syncDir.exists()) {
             syncDir.mkdirs()
         }

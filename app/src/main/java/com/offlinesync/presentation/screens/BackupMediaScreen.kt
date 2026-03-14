@@ -17,11 +17,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Usb
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
@@ -30,7 +33,9 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -62,10 +67,14 @@ fun BackupMediaScreen(
     val backupResult by viewModel.backupResult.collectAsState()
     val backupProgress by viewModel.backupProgress.collectAsState()
     val estimatedTimeRemaining by viewModel.estimatedTimeRemaining.collectAsState()
+    val selectedBackupPath by viewModel.selectedBackupPath.collectAsState()
 
     var includeImages by remember { mutableStateOf(true) }
     var includeVideos by remember { mutableStateOf(true) }
     var includeAudio by remember { mutableStateOf(true) }
+    var useExternalStorage by remember { mutableStateOf(false) }
+    
+    val isPremiumVersion = BackupMediaViewModel.IS_PREMIUM_VERSION
     
     fun checkStoragePermission(): Boolean {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
@@ -95,6 +104,23 @@ fun BackupMediaScreen(
                 requestPermissionLauncher.launch(intent)
             }
         }
+    }
+
+    val folderPickerLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.OpenDocumentTree()
+    ) { uri ->
+        uri?.let {
+            context.contentResolver.takePersistableUriPermission(
+                it,
+                Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+            )
+            val path = it.path ?: ""
+            viewModel.setBackupPath(path)
+        }
+    }
+
+    fun selectBackupFolder() {
+        folderPickerLauncher.launch(null)
     }
 
     Scaffold(
@@ -180,6 +206,66 @@ fun BackupMediaScreen(
                     verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     Text(text = "Telegram, WhatsApp, Viber, Signal, Facebook Messenger, Snapchat, Instagram, Discord, Skype, Line, WeChat")
+                }
+            }
+
+            if (isPremiumVersion) {
+                Text(
+                    text = strings.backupDestination,
+                    style = MaterialTheme.typography.titleMedium
+                )
+
+                Card(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(Icons.Default.Usb, contentDescription = null)
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(text = strings.externalStorage)
+                            }
+                            Switch(
+                                checked = useExternalStorage,
+                                onCheckedChange = { 
+                                    useExternalStorage = it
+                                    if (!it) {
+                                        viewModel.setBackupPath(null)
+                                    }
+                                }
+                            )
+                        }
+
+                        if (useExternalStorage) {
+                            OutlinedButton(
+                                onClick = { selectBackupFolder() },
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Icon(Icons.Default.Folder, contentDescription = null)
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = selectedBackupPath?.substringAfterLast("/") 
+                                        ?: strings.selectFolder
+                                )
+                            }
+                            Text(
+                                text = strings.selectFolderHint,
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                        } else {
+                            Text(
+                                text = "${strings.internalStorage}: Downloads/OfflineSync/Media",
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                        }
+                    }
                 }
             }
 
