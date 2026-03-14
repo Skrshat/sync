@@ -19,7 +19,7 @@ import com.offlinesync.presentation.screens.BackupSmsScreen
 import com.offlinesync.presentation.screens.RestoreSmsScreen
 import com.offlinesync.presentation.screens.BackupAppsScreen
 import com.offlinesync.presentation.screens.BackupMediaScreen
-import com.offlinesync.presentation.screens.FtpServerScreen
+
 import com.offlinesync.presentation.screens.SettingsScreen
 import com.offlinesync.presentation.theme.OfflineSyncTheme
 import com.offlinesync.utils.LanguageManager
@@ -69,7 +69,7 @@ class MainActivity : ComponentActivity() {
                                 onNavigateToRestoreSms = { navController.navigate("restoreSms") },
                                 onNavigateToBackupApps = { navController.navigate("backupApps") },
                                 onNavigateToBackupMedia = { navController.navigate("backupMedia") },
-                                onNavigateToFtpServer = { navController.navigate("ftpServer") },
+
                                 onNavigateToSettings = { navController.navigate("settings") }
                             )
                         }
@@ -129,14 +129,7 @@ class MainActivity : ComponentActivity() {
                                 } }
                             )
                         }
-                        composable("ftpServer") {
-                            FtpServerScreen(
-                                onNavigateBack = { navController.popBackStack() },
-                                onNavigateHome = { navController.navigate("home") {
-                                    popUpTo("home") { inclusive = true }
-                                } }
-                            )
-                        }
+
                         composable("settings") {
                             SettingsScreen(
                                 onNavigateBack = { navController.popBackStack() },

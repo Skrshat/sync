@@ -32,7 +32,9 @@ TRANSLATIONS = {
         "refresh": "Refresh",
         "not_connected": "Not connected",
         "connected": "Connected",
-        "sync": "Sync ⇄",
+        "download": "Download ↓",
+        "upload": "Upload ↑",
+        "stop": "Stop",
         "log": "Log",
         "file_exists": "File exists. Overwrite?",
         "yes": "Yes",
@@ -41,13 +43,10 @@ TRANSLATIONS = {
         "searching_devices": "Searching devices...",
         "select_device": "Select a device!",
         "device_selected": "Selected",
-        "sync_started": "=== Sync Started ===",
         "device_unavailable": "Device unavailable",
         "items_on_android": "Items on Android",
         "created_folder": "Created folder",
         "local_files": "Local files",
-        "download": "Download",
-        "upload": "Upload",
         "downloaded": "Downloaded",
         "uploaded": "Uploaded",
         "error": "Error",
@@ -56,7 +55,6 @@ TRANSLATIONS = {
         "saved_apps": "Saved apps",
         "error_getting_apps": "Error getting apps",
         "file_exists": "File exists",
-        "sync_complete": "=== Sync Complete ===",
         "settings": "Settings",
         "language": "Language",
         "help": "Help",
@@ -64,7 +62,7 @@ TRANSLATIONS = {
         "restart_now": "Restart Now",
         "later": "Later",
         "help_title": "Help",
-        "help_content": "OfflineSync allows you to sync files between your Android device and computer without internet.\n\n1. Connect both devices to the same WiFi network\n2. Start the server on Android\n3. Run sync on your computer\n\nFiles are stored in the OfflineSync folder in your home directory.",
+        "help_content": "OfflineSync allows you to sync files between your Android device and computer without internet.\n\n1. Connect both devices to the same WiFi network\n2. Browse and transfer files\n\nFiles are stored in the OfflineSync folder in your home directory.",
         "english": "English",
         "russian": "Russian",
         "ukrainian": "Ukrainian",
@@ -72,26 +70,25 @@ TRANSLATIONS = {
         "warning": "Warning",
         "done": "Done",
         "cancel": "Cancel",
-        "ftp_server": "Files on Android",
-        "ftp_connect": "Connect",
-        "ftp_disconnect": "Disconnect",
-        "ftp_connected": "Connected",
-        "ftp_not_connected": "Not Connected",
-        "ftp_address": "Address:",
-        "ftp_browse": "Browse",
+        "android_files": "Files on Android",
+        "local_browser": "Local Files",
+        "ftp_refresh": "Refresh",
         "ftp_download": "Download",
         "ftp_upload": "Upload",
-        "ftp_refresh": "Refresh",
-        "ftp_download_dir": "Download Folder",
-        "ftp_upload_dir": "Upload Folder",
-        "ftp_current_dir": "Current:",
-        "ftp_files": "Files",
+        "ftp_current_dir": "Path:",
         "ftp_select_file": "Select file to download",
         "ftp_select_local": "Select local file to upload",
         "select_folder": "Select folder",
         "progress": "Progress",
         "current_operation": "Current:",
         "parent_dir": "Parent",
+        "browse_local": "Browse",
+        "downloading": "Downloading",
+        "uploading": "Uploading",
+        "delete": "Delete",
+        "delete_confirm": "Delete this?",
+        "delete_success": "Deleted successfully",
+        "delete_error": "Delete error",
     },
     LANGUAGE_RU: {
         "app_title": "OfflineSync - Ubuntu ↔ Android",
@@ -101,7 +98,9 @@ TRANSLATIONS = {
         "refresh": "Обновить",
         "not_connected": "Не подключено",
         "connected": "Подключено",
-        "sync": "Синхронизировать ⇄",
+        "download": "Скачать ↓",
+        "upload": "Загрузить ↑",
+        "stop": "Стоп",
         "log": "Лог",
         "file_exists": "Файл существует. Перезаписать?",
         "yes": "Да",
@@ -110,13 +109,10 @@ TRANSLATIONS = {
         "searching_devices": "Поиск устройств...",
         "select_device": "Выберите устройство!",
         "device_selected": "Выбрано",
-        "sync_started": "=== Синхронизация ===",
         "device_unavailable": "Устройство недоступно",
         "items_on_android": "Элементов на Android",
         "created_folder": "Создана папка",
         "local_files": "Файлов локально",
-        "download": "Скачать",
-        "upload": "Загрузить",
         "downloaded": "Скачано",
         "uploaded": "Загружено",
         "error": "Ошибка",
@@ -125,7 +121,6 @@ TRANSLATIONS = {
         "saved_apps": "Сохранено приложений",
         "error_getting_apps": "Ошибка получения приложений",
         "file_exists": "Файл существует",
-        "sync_complete": "=== Синхронизация завершена ===",
         "settings": "Настройки",
         "language": "Язык",
         "help": "Справка",
@@ -133,7 +128,7 @@ TRANSLATIONS = {
         "restart_now": "Перезапустить",
         "later": "Позже",
         "help_title": "Справка",
-        "help_content": "OfflineSync позволяет синхронизировать файлы между Android и компьютером без интернета.\n\n1. Подключите оба устройства к одной WiFi сети\n2. Запустите сервер на Android\n3. Запустите синхронизацию на компьютере\n\nФайлы сохраняются в папке OfflineSync в домашнем каталоге.",
+        "help_content": "OfflineSync позволяет синхронизировать файлы между Android и компьютером без интернета.\n\n1. Подключите оба устройства к одной WiFi сети\n2. Просматривайте и передавайте файлы\n\nФайлы сохраняются в папке OfflineSync в домашнем каталоге.",
         "english": "Английский",
         "russian": "Русский",
         "ukrainian": "Украинский",
@@ -141,26 +136,25 @@ TRANSLATIONS = {
         "warning": "Внимание",
         "done": "Готово",
         "cancel": "Отмена",
-        "ftp_server": "Файлы на Android",
-        "ftp_connect": "Подключить",
-        "ftp_disconnect": "Отключить",
-        "ftp_connected": "Подключён",
-        "ftp_not_connected": "Не подключён",
-        "ftp_address": "Адрес:",
-        "ftp_browse": "Обзор",
+        "android_files": "Файлы на Android",
+        "local_browser": "Локальные файлы",
+        "ftp_refresh": "Обновить",
         "ftp_download": "Скачать",
         "ftp_upload": "Загрузить",
-        "ftp_refresh": "Обновить",
-        "ftp_download_dir": "Скачать папку",
-        "ftp_upload_dir": "Загрузить папку",
-        "ftp_current_dir": "Текущая:",
-        "ftp_files": "Файлы",
+        "ftp_current_dir": "Путь:",
         "ftp_select_file": "Выберите файл для скачивания",
         "ftp_select_local": "Выберите локальный файл для загрузки",
         "select_folder": "Выберите папку",
         "progress": "Прогресс",
         "current_operation": "Текущая:",
         "parent_dir": "Назад",
+        "browse_local": "Обзор",
+        "downloading": "Скачивание",
+        "uploading": "Загрузка",
+        "delete": "Удалить",
+        "delete_confirm": "Удалить это?",
+        "delete_success": "Успешно удалено",
+        "delete_error": "Ошибка удаления",
     },
     LANGUAGE_UK: {
         "app_title": "OfflineSync - Ubuntu ↔ Android",
@@ -170,7 +164,9 @@ TRANSLATIONS = {
         "refresh": "Оновити",
         "not_connected": "Не підключено",
         "connected": "Підключено",
-        "sync": "Синхронізувати ⇄",
+        "download": "Скачати ↓",
+        "upload": "Завантажити ↑",
+        "stop": "Стоп",
         "log": "Лог",
         "file_exists": "Файл існує. Перезаписати?",
         "yes": "Так",
@@ -179,13 +175,10 @@ TRANSLATIONS = {
         "searching_devices": "Пошук пристроїв...",
         "select_device": "Виберіть пристрій!",
         "device_selected": "Вибрано",
-        "sync_started": "=== Синхронізація ===",
         "device_unavailable": "Пристрій недоступний",
         "items_on_android": "Елементів на Android",
         "created_folder": "Створено папку",
         "local_files": "Локальних файлів",
-        "download": "Скачати",
-        "upload": "Завантажити",
         "downloaded": "Скачано",
         "uploaded": "Завантажено",
         "error": "Помилка",
@@ -194,7 +187,6 @@ TRANSLATIONS = {
         "saved_apps": "Збережено додатків",
         "error_getting_apps": "Помилка отримання додатків",
         "file_exists": "Файл існує",
-        "sync_complete": "=== Синхронізація завершена ===",
         "settings": "Налаштування",
         "language": "Мова",
         "help": "Допомога",
@@ -202,7 +194,7 @@ TRANSLATIONS = {
         "restart_now": "Перезапустити",
         "later": "Пізніше",
         "help_title": "Допомога",
-        "help_content": "OfflineSync дозволяє синхронізувати файли між Android та комп'ютером без інтернету.\n\n1. Підключіть обидва пристрої до однієї WiFi мережі\n2. Запустіть сервер на Android\n3. Запустіть синхронізацію на комп'ютері\n\nФайли зберігаються в папці OfflineSync у домашньому каталозі.",
+        "help_content": "OfflineSync дозволяє синхронізувати файли між Android та комп'ютером без інтернету.\n\n1. Підключіть обидва пристрої до однієї WiFi мережі\n2. Переглядайте та передавайте файли\n\nФайли зберігаються в папці OfflineSync у домашньому каталозі.",
         "english": "Англійська",
         "russian": "Російська",
         "ukrainian": "Українська",
@@ -210,26 +202,25 @@ TRANSLATIONS = {
         "warning": "Попередження",
         "done": "Готово",
         "cancel": "Скасувати",
-        "ftp_server": "Файли на Android",
-        "ftp_connect": "Підключити",
-        "ftp_disconnect": "Відключити",
-        "ftp_connected": "Підключено",
-        "ftp_not_connected": "Не підключено",
-        "ftp_address": "Адреса:",
-        "ftp_browse": "Огляд",
+        "android_files": "Файли на Android",
+        "local_browser": "Локальні файли",
+        "ftp_refresh": "Оновити",
         "ftp_download": "Скачати",
         "ftp_upload": "Завантажити",
-        "ftp_refresh": "Оновити",
-        "ftp_download_dir": "Скачати папку",
-        "ftp_upload_dir": "Завантажити папку",
-        "ftp_current_dir": "Поточна:",
-        "ftp_files": "Файли",
+        "ftp_current_dir": "Шлях:",
         "ftp_select_file": "Оберіть файл для скачування",
         "ftp_select_local": "Оберіть локальний файл для завантаження",
         "select_folder": "Оберіть папку",
         "progress": "Прогрес",
         "current_operation": "Поточна:",
         "parent_dir": "Назад",
+        "browse_local": "Огляд",
+        "downloading": "Скачування",
+        "uploading": "Завантаження",
+        "delete": "Видалити",
+        "delete_confirm": "Видалити це?",
+        "delete_success": "Успішно видалено",
+        "delete_error": "Помилка видалення",
     }
 }
 
@@ -293,19 +284,19 @@ class WindowManager:
     def get_window_geometry(self):
         try:
             if not os.path.exists(self.config_file):
-                return "650x500"
+                return "700x550"
             config = configparser.ConfigParser()
             config.read(self.config_file)
             if not config.has_section('window'):
-                return "650x500"
+                return "700x550"
             x = config.get('window', 'x', fallback='100')
             y = config.get('window', 'y', fallback='100')
-            width = config.get('window', 'width', fallback='650')
-            height = config.get('window', 'height', fallback='500')
+            width = config.get('window', 'width', fallback='700')
+            height = config.get('window', 'height', fallback='550')
             return f"{width}x{height}+{x}+{y}"
         except Exception as e:
             print(f"Error loading window position: {e}")
-            return "650x500"
+            return "700x550"
 
 
 class OfflineSyncGUI:
@@ -325,9 +316,15 @@ class OfflineSyncGUI:
         self.base_url = None
         self.pending_uploads = []
         
-        # HTTP file browser variables
         self.http_connected = False
         self.http_current_dir = ""
+        
+        self.cancel_download = False
+        self.cancel_upload = False
+        self.is_downloading = False
+        self.is_uploading = False
+        
+        self.local_current_dir = ""
         
         self.root.protocol("WM_DELETE_WINDOW", self.on_close)
         
@@ -379,58 +376,109 @@ class OfflineSyncGUI:
         device_frame = tk.LabelFrame(main_frame, text=self.lang.t("devices"), padx=5, pady=3)
         device_frame.pack(fill=tk.X, pady=2)
         
+        ip_frame = tk.Frame(device_frame)
+        ip_frame.pack(fill=tk.X, pady=2)
+        tk.Label(ip_frame, text="IP:").pack(side=tk.LEFT)
+        self.ip_entry = tk.Entry(ip_frame, width=15)
+        self.ip_entry.insert(0, "192.168.1.")
+        self.ip_entry.pack(side=tk.LEFT, padx=3)
+        tk.Button(ip_frame, text="Connect", command=self.connect_to_ip).pack(side=tk.LEFT, padx=3)
+        
         self.device_listbox = tk.Listbox(device_frame, height=3)
         self.device_listbox.pack(fill=tk.X)
         self.device_listbox.bind('<<ListboxSelect>>', self.on_device_select)
         
         tk.Button(device_frame, text=self.lang.t("refresh"), command=self.refresh_devices).pack(pady=2)
         
-        self.status_label = tk.Label(main_frame, text=self.lang.t("not_connected"), fg="gray", font=("Helvetica", 9))
+        self.status_label = tk.Label(main_frame, text=self.lang.t("not_connected"), fg="black", font=("Helvetica", 9))
         self.status_label.pack()
         
         btn_frame = tk.Frame(main_frame)
         btn_frame.pack(pady=2)
-        tk.Button(btn_frame, text=self.lang.t("sync"), bg="#2196F3", fg="white", 
-                 command=self.do_sync).pack(side=tk.LEFT, padx=3)
         
-        http_frame = tk.LabelFrame(main_frame, text=self.lang.t("ftp_server"), padx=5, pady=3)
-        http_frame.pack(fill=tk.BOTH, expand=True, pady=2)
+        self.download_btn = tk.Button(btn_frame, text=self.lang.t("download"), 
+                                       command=self.download_selected, state=tk.DISABLED)
+        self.download_btn.pack(side=tk.LEFT, padx=2)
         
-        http_top = tk.Frame(http_frame)
-        http_top.pack(fill=tk.X)
+        self.upload_btn = tk.Button(btn_frame, text=self.lang.t("upload"), 
+                                    command=self.upload_selected, state=tk.DISABLED)
+        self.upload_btn.pack(side=tk.LEFT, padx=2)
         
-        tk.Label(http_top, text=self.lang.t("ftp_current_dir")).pack(side=tk.LEFT)
-        self.ftp_dir_label = tk.Label(http_top, text="/", fg="blue", font=("Helvetica", 9))
+        self.stop_btn = tk.Button(btn_frame, text=self.lang.t("stop"), 
+                                  command=self.stop_operation, state=tk.DISABLED)
+        self.stop_btn.pack(side=tk.LEFT, padx=2)
+        
+        pans = tk.PanedWindow(main_frame, orient=tk.HORIZONTAL)
+        pans.pack(fill=tk.BOTH, expand=True, pady=2)
+        
+        android_frame = tk.LabelFrame(pans, text=self.lang.t("android_files"), padx=5, pady=3)
+        pans.add(android_frame, width=300)
+        
+        android_top = tk.Frame(android_frame)
+        android_top.pack(fill=tk.X)
+        
+        tk.Label(android_top, text=self.lang.t("ftp_current_dir")).pack(side=tk.LEFT)
+        self.ftp_dir_label = tk.Label(android_top, text="/", fg="black", font=("Helvetica", 9))
         self.ftp_dir_label.pack(side=tk.LEFT, padx=3)
         
-        http_btn_row = tk.Frame(http_frame)
-        http_btn_row.pack(fill=tk.X, pady=2)
+        android_btn_row = tk.Frame(android_frame)
+        android_btn_row.pack(fill=tk.X, pady=2)
         
-        tk.Button(http_btn_row, text=self.lang.t("parent_dir"), 
+        tk.Button(android_btn_row, text=self.lang.t("parent_dir"), 
                   command=self.http_cdup).pack(side=tk.LEFT, padx=1)
-        tk.Button(http_btn_row, text=self.lang.t("ftp_refresh"), 
+        tk.Button(android_btn_row, text=self.lang.t("ftp_refresh"), 
                   command=self.http_refresh).pack(side=tk.LEFT, padx=1)
-        tk.Button(http_btn_row, text=self.lang.t("ftp_download"), 
-                  command=self.http_download_file).pack(side=tk.LEFT, padx=1)
-        tk.Button(http_btn_row, text=self.lang.t("ftp_upload"), 
-                  command=self.http_upload_file).pack(side=tk.LEFT, padx=1)
+        tk.Button(android_btn_row, text=self.lang.t("delete"), 
+                  command=self.http_delete_selected).pack(side=tk.LEFT, padx=1)
         
-        http_file_frame = tk.Frame(http_frame)
-        http_file_frame.pack(fill=tk.BOTH, expand=True, pady=2)
+        android_file_frame = tk.Frame(android_frame)
+        android_file_frame.pack(fill=tk.BOTH, expand=True, pady=2)
         
-        self.http_file_listbox = tk.Listbox(http_file_frame)
+        self.http_file_listbox = tk.Listbox(android_file_frame)
         self.http_file_listbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         self.http_file_listbox.bind('<Double-Button-1>', self.http_on_double_click)
         
-        http_scroll = tk.Scrollbar(http_file_frame, orient=tk.VERTICAL)
-        http_scroll.pack(side=tk.RIGHT, fill=tk.Y)
-        self.http_file_listbox.config(yscrollcommand=http_scroll.set)
-        http_scroll.config(command=self.http_file_listbox.yview)
+        android_scroll = tk.Scrollbar(android_file_frame, orient=tk.VERTICAL)
+        android_scroll.pack(side=tk.RIGHT, fill=tk.Y)
+        self.http_file_listbox.config(yscrollcommand=android_scroll.set)
+        android_scroll.config(command=self.http_file_listbox.yview)
+        
+        local_frame = tk.LabelFrame(pans, text=self.lang.t("local_browser"), padx=5, pady=3)
+        pans.add(local_frame)
+        
+        local_top = tk.Frame(local_frame)
+        local_top.pack(fill=tk.X)
+        
+        tk.Label(local_top, text=self.lang.t("ftp_current_dir")).pack(side=tk.LEFT)
+        self.local_dir_label = tk.Label(local_top, text="/", fg="black", font=("Helvetica", 9))
+        self.local_dir_label.pack(side=tk.LEFT, padx=3)
+        
+        local_btn_row = tk.Frame(local_frame)
+        local_btn_row.pack(fill=tk.X, pady=2)
+        
+        tk.Button(local_btn_row, text=self.lang.t("parent_dir"), 
+                  command=self.local_cdup).pack(side=tk.LEFT, padx=1)
+        tk.Button(local_btn_row, text=self.lang.t("browse_local"), 
+                  command=self.local_refresh).pack(side=tk.LEFT, padx=1)
+        tk.Button(local_btn_row, text=self.lang.t("delete"), 
+                  command=self.local_delete_selected).pack(side=tk.LEFT, padx=1)
+        
+        local_file_frame = tk.Frame(local_frame)
+        local_file_frame.pack(fill=tk.BOTH, expand=True, pady=2)
+        
+        self.local_file_listbox = tk.Listbox(local_file_frame)
+        self.local_file_listbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        self.local_file_listbox.bind('<Double-Button-1>', self.local_on_double_click)
+        
+        local_scroll = tk.Scrollbar(local_file_frame, orient=tk.VERTICAL)
+        local_scroll.pack(side=tk.RIGHT, fill=tk.Y)
+        self.local_file_listbox.config(yscrollcommand=local_scroll.set)
+        local_scroll.config(command=self.local_file_listbox.yview)
         
         log_frame = tk.LabelFrame(main_frame, text=self.lang.t("log"), padx=5, pady=3)
         log_frame.pack(fill=tk.BOTH, expand=True, pady=2)
         
-        self.log_text = tk.Text(log_frame, height=5)
+        self.log_text = tk.Text(log_frame, height=4)
         self.log_text.pack(fill=tk.BOTH, expand=True)
         
         progress_frame = tk.Frame(main_frame)
@@ -442,18 +490,8 @@ class OfflineSyncGUI:
         self.progress = ttk.Progressbar(progress_frame, mode='determinate')
         self.progress.pack(fill=tk.X, pady=1)
         
-        self.operation_label = tk.Label(progress_frame, text="", font=("Helvetica", 8), fg="blue")
+        self.operation_label = tk.Label(progress_frame, text="", font=("Helvetica", 8), fg="black")
         self.operation_label.pack(side=tk.LEFT)
-        
-        self.overwrite_frame = tk.Frame(self.root, relief=tk.RIDGE, borderwidth=2)
-        tk.Label(self.overwrite_frame, text=self.lang.t("file_exists")).pack(pady=3)
-        self.overwrite_file_label = tk.Label(self.overwrite_frame, text="", fg="red")
-        self.overwrite_file_label.pack()
-        btn_row = tk.Frame(self.overwrite_frame)
-        btn_row.pack(pady=3)
-        tk.Button(btn_row, text=self.lang.t("yes"), command=lambda: self.handle_overwrite(True)).pack(side=tk.LEFT, padx=3)
-        tk.Button(btn_row, text=self.lang.t("no"), command=lambda: self.handle_overwrite(False)).pack(side=tk.LEFT, padx=3)
-        tk.Button(btn_row, text=self.lang.t("cancel_all"), command=self.cancel_all_uploads).pack(side=tk.LEFT, padx=3)
 
     def update_progress(self, current, total, filename):
         percent = int((current / total) * 100) if total > 0 else 0
@@ -518,6 +556,9 @@ class OfflineSyncGUI:
             self.sync_folder = folder
             self.folder_entry.delete(0, tk.END)
             self.folder_entry.insert(0, folder)
+            self.local_current_dir = folder
+            self.local_dir_label.config(text=folder)
+            self.local_refresh()
     
     def refresh_devices(self):
         threading.Thread(target=self._refresh_devices, daemon=True).start()
@@ -534,161 +575,113 @@ class OfflineSyncGUI:
     
     def on_device_select(self, event):
         selection = self.device_listbox.curselection()
-        if selection:
+        if selection and selection[0] < len(self.devices):
             device = self.devices[selection[0]]
             self.android_ip = device['ip']
             self.base_url = f"http://{self.android_ip}:{self.android_port}"
-            self.status_label.config(text=f"{self.lang.t('connected')}: {self.android_ip}", fg="green")
+            self.status_label.config(text=f"{self.lang.t('connected')}: {self.android_ip}", fg="black")
             self.log(f"{self.lang.t('device_selected')}: {self.android_ip}:{self.android_port}")
             self.http_connected = True
             self.http_current_dir = ""
+            self.download_btn.config(state=tk.NORMAL)
+            self.upload_btn.config(state=tk.NORMAL)
+            self.local_current_dir = self.sync_folder
+            self.local_dir_label.config(text=self.local_current_dir)
             self.http_refresh()
+            self.local_refresh()
     
-    def do_sync(self):
-        if not self.base_url:
-            messagebox.showwarning("Warning", self.lang.t("select_device"))
+    def connect_to_ip(self):
+        ip = self.ip_entry.get().strip()
+        if not ip:
             return
+        
+        self.android_ip = ip
+        self.base_url = f"http://{self.android_ip}:{self.android_port}"
+        
+        try:
+            r = requests.get(f"{self.base_url}/ping", timeout=3)
+            if r.status_code == 200:
+                self.status_label.config(text=f"{self.lang.t('connected')}: {self.android_ip}", fg="black")
+                self.log(f"{self.lang.t('device_selected')}: {self.android_ip}:{self.android_port}")
+                self.http_connected = True
+                self.http_current_dir = ""
+                self.download_btn.config(state=tk.NORMAL)
+                self.upload_btn.config(state=tk.NORMAL)
+                self.local_current_dir = self.sync_folder
+                self.local_dir_label.config(text=self.local_current_dir)
+                self.http_refresh()
+                self.local_refresh()
+            else:
+                self.log(f"{self.lang.t('device_unavailable')}")
+        except Exception as e:
+            self.log(f"{self.lang.t('error')}: {e}")
+            
+            self.local_current_dir = self.sync_folder
+            self.local_dir_label.config(text=self.local_current_dir)
+            
+            self.http_refresh()
+            self.local_refresh()
+    
+    def download_selected(self):
+        if not self.http_connected or not self.base_url:
+            return
+        
+        selection = self.http_file_listbox.curselection()
+        if not selection:
+            messagebox.showwarning(self.lang.t("warning"), self.lang.t("ftp_select_file"))
+            return
+        
+        item = self.http_file_listbox.get(selection[0])
         
         folder = self.folder_entry.get()
         if not os.path.isdir(folder):
             os.makedirs(folder, exist_ok=True)
         
-        self.progress['value'] = 0
-        threading.Thread(target=self._do_sync, args=(folder,), daemon=True).start()
+        if item.startswith("[DIR]"):
+            name = item.replace("[DIR]", "").strip()
+            threading.Thread(target=self._http_download_dir, 
+                            args=(name, folder), daemon=True).start()
+        else:
+            filename = item.replace("[FILE]", "").strip()
+            threading.Thread(target=self._http_download_file, 
+                            args=(filename, folder), daemon=True).start()
     
-    def _do_sync(self, folder):
-        try:
-            self.log(self.lang.t("sync_started"))
-            
-            r = requests.get(f"{self.base_url}/ping", timeout=5)
-            if r.status_code != 200:
-                self.log(self.lang.t("device_unavailable"))
-                return
-            
-            r = requests.get(f"{self.base_url}/files", timeout=10)
-            android_items = []
-            if r.status_code == 200:
-                try:
-                    data = r.json()
-                    android_items = data.get('items', [])
-                except:
-                    pass
-            
-            self.log(f"{self.lang.t('items_on_android')}: {len(android_items)}")
-            
-            downloaded = 0
-            total_items = len(android_items)
-            
-            for idx, item in enumerate(android_items):
-                name = item.get('name', '')
-                is_dir = item.get('isDirectory', False)
-                
-                if name:
-                    if is_dir:
-                        local_path = Path(folder) / name
-                        local_path.mkdir(parents=True, exist_ok=True)
-                        self.log(f"{self.lang.t('created_folder')}: {name}")
-                        downloaded += 1
-                    else:
-                        self.root.after(0, lambda i=idx, t=total_items, n=name: self.update_progress(i+1, t, n))
-                        if self.download_file(name, folder):
-                            downloaded += 1
-            
-            uploaded = 0
-            local_files = self.get_local_files(folder)
-            self.log(f"{self.lang.t('local_files')}: {len(local_files)}")
-            
-            android_names = set(item.get('name', '') for item in android_items if not item.get('isDirectory', False))
-            
-            total_uploads = len(local_files)
-            for idx, local_file in enumerate(local_files):
-                rel_path = str(Path(local_file).relative_to(folder))
-                
-                if rel_path not in android_names:
-                    self.root.after(0, lambda i=idx, t=total_uploads, n=rel_path: self.update_progress(i+1, t, n))
-                    if self.upload_file_with_check(local_file, folder):
-                        uploaded += 1
-            
-            self.log(self.lang.t("getting_apps_list"))
-            try:
-                r = requests.get(f"{self.base_url}/apps", timeout=30)
-                if r.status_code == 200:
-                    apps_data = r.json()
-                    apps_list = apps_data.get('apps', [])
-                    self.log(f"{self.lang.t('saved_apps')}: {len(apps_list)}")
-            except Exception as e:
-                self.log(f"{self.lang.t('error_getting_apps')}: {e}")
-            
-            self.log(f"{self.lang.t('uploaded')}: {uploaded}, {self.lang.t('downloaded')}: {downloaded}")
-            self.root.after(0, lambda: messagebox.showinfo(self.lang.t("done"), f"{self.lang.t('uploaded')}: {uploaded}\n{self.lang.t('downloaded')}: {downloaded}"))
-        except Exception as e:
-            self.log(f"{self.lang.t('error')}: {e}")
-            import traceback
-            self.log(traceback.format_exc())
-        finally:
-            self.root.after(0, self.stop_progress)
-    
-    def get_local_files(self, folder):
-        files = []
-        folder_path = Path(folder)
-        for item in folder_path.rglob('*'):
-            if item.is_file():
-                files.append(str(item))
-        return files
-    
-    def upload_file_with_check(self, filepath, base_folder):
-        rel_path = str(Path(filepath).relative_to(base_folder))
+    def upload_selected(self):
+        if not self.http_connected or not self.base_url:
+            return
         
-        try:
-            r = requests.get(f"{self.base_url}/exists?path={quote(rel_path)}", timeout=5)
-            if r.status_code == 200:
-                data = r.json()
-                if data.get('exists', False):
-                    self.log(f"{self.lang.t('file_exists')}: {rel_path}")
-                    self.pending_uploads.append((filepath, base_folder, rel_path))
-                    self.root.after(0, self.show_overwrite_dialog, rel_path)
-                    return False
-        except:
-            pass
+        selection = self.local_file_listbox.curselection()
+        if not selection:
+            messagebox.showwarning(self.lang.t("warning"), self.lang.t("ftp_select_local"))
+            return
         
-        return self.upload_file(filepath, base_folder)
-    
-    def show_overwrite_dialog(self, filename):
-        self.overwrite_file_label.config(text=filename)
-        self.overwrite_frame.pack(fill=tk.X, padx=20, pady=5)
-    
-    def handle_overwrite(self, overwrite):
-        self.overwrite_frame.pack_forget()
+        item = self.local_file_listbox.get(selection[0])
         
-        if self.pending_uploads:
-            filepath, base_folder, rel_path = self.pending_uploads.pop(0)
-            
-            if overwrite:
-                self.upload_file(filepath, base_folder)
-            else:
-                base_path = Path(base_folder) / rel_path
-                base_name = base_path.stem
-                ext = base_path.suffix
-                counter = 1
-                while base_path.exists():
-                    if ext:
-                        new_name = f"{base_name}_{counter}{ext}"
-                    else:
-                        new_name = f"{base_name}_{counter}"
-                    base_path = base_path.parent / new_name
-                    counter += 1
-                
-                self.log(f"Renamed to: {base_path.name}")
-                self.upload_file(str(base_path), base_folder)
-            
-            if self.pending_uploads:
-                next_file = self.pending_uploads[0][2]
-                self.root.after(0, self.show_overwrite_dialog, next_file)
+        if item.startswith("[DIR]"):
+            return
+        
+        filename = item.replace("[FILE]", "").strip()
+        local_path = os.path.join(self.local_current_dir, filename)
+        
+        threading.Thread(target=self._http_upload_file, 
+                        args=(local_path,), daemon=True).start()
     
-    def cancel_all_uploads(self):
-        self.overwrite_frame.pack_forget()
-        self.pending_uploads = []
-        self.log("Upload cancelled")
+    def stop_operation(self):
+        self.cancel_download = True
+        self.cancel_upload = True
+        self.log("Stopping operation...")
+    
+    def set_buttons_for_operation(self, is_running):
+        if is_running:
+            self.download_btn.config(state=tk.DISABLED)
+            self.upload_btn.config(state=tk.DISABLED)
+            self.stop_btn.config(state=tk.NORMAL)
+        else:
+            self.download_btn.config(state=tk.NORMAL if self.http_connected else tk.DISABLED)
+            self.upload_btn.config(state=tk.NORMAL if self.http_connected else tk.DISABLED)
+            self.stop_btn.config(state=tk.DISABLED)
+        self.is_downloading = is_running
+        self.is_uploading = is_running
     
     def http_refresh(self):
         if not self.http_connected or not self.base_url:
@@ -749,41 +742,15 @@ class OfflineSyncGUI:
                 self.ftp_dir_label.config(text="/" + self.http_current_dir)
                 self.http_refresh()
     
-    def http_download_file(self):
-        if not self.http_connected:
-            messagebox.showwarning(self.lang.t("warning"), self.lang.t("ftp_not_connected"))
-            return
-        
-        selection = self.http_file_listbox.curselection()
-        if not selection:
-            messagebox.showwarning(self.lang.t("warning"), self.lang.t("ftp_select_file"))
-            return
-        
-        item = self.http_file_listbox.get(selection[0])
-        if item.startswith("[DIR]"):
-            name = item.replace("[DIR]", "").strip()
-            folder = filedialog.askdirectory(title=self.lang.t("select_folder"))
-            if not folder:
-                return
-            threading.Thread(target=self._http_download_dir, 
-                            args=(name, folder), daemon=True).start()
-            return
-        
-        filename = item.replace("[FILE]", "").strip()
-        
-        folder = filedialog.askdirectory(title=self.lang.t("select_folder"))
-        if not folder:
-            return
-        
-        threading.Thread(target=self._http_download_file, 
-                        args=(filename, folder), daemon=True).start()
-    
     def _http_download_file(self, filename, folder):
+        self.root.after(0, lambda: self.set_buttons_for_operation(True))
+        self.cancel_download = False
+        
         try:
             local_path = os.path.join(folder, filename)
-            self.log(f"Downloading {filename}...")
+            self.log(f"{self.lang.t('downloading')} {filename}...")
             
-            url = f"{self.base_url}/download?path={quote(filename)}"
+            url = f"{self.base_url}/download?path={quote(self.http_current_dir + '/' + filename) if self.http_current_dir else quote(filename)}"
             r = requests.get(url, timeout=300, stream=True)
             
             if r.status_code == 200:
@@ -792,18 +759,28 @@ class OfflineSyncGUI:
                 with open(local_path, 'wb') as f:
                     downloaded = 0
                     for chunk in r.iter_content(chunk_size=8192):
-                        f.write(downloaded)
+                        if self.cancel_download:
+                            self.log("Download cancelled")
+                            break
+                        f.write(chunk)
                         downloaded += len(chunk)
                         if total_size > 0:
                             percent = int((downloaded / total_size) * 100)
                             self.root.after(0, lambda p=percent, n=filename: self.update_progress(p, 100, n))
                 
-                self.root.after(0, lambda: self.log(f"Downloaded {filename}"))
-                self.root.after(0, lambda: self.stop_progress())
+                if not self.cancel_download:
+                    self.root.after(0, lambda: self.log(f"Downloaded {filename}"))
+                    self.root.after(0, lambda: self.local_refresh())
         except Exception as e:
             self.root.after(0, lambda: self.log(f"Error: {e}"))
+        finally:
+            self.root.after(0, lambda: self.set_buttons_for_operation(False))
+            self.root.after(0, lambda: self.stop_progress())
     
     def _http_download_dir(self, dirname, folder):
+        self.root.after(0, lambda: self.set_buttons_for_operation(True))
+        self.cancel_download = False
+        
         try:
             self.log(f"Downloading folder {dirname}...")
             path = f"{self.http_current_dir}/{dirname}" if self.http_current_dir else dirname
@@ -817,9 +794,14 @@ class OfflineSyncGUI:
                 local_path = Path(folder) / dirname
                 local_path.mkdir(parents=True, exist_ok=True)
                 
-                for item in items:
+                total = len(items)
+                for idx, item in enumerate(items):
+                    if self.cancel_download:
+                        break
+                    
                     name = item.get('name', '')
                     is_dir = item.get('isDirectory', False)
+                    self.root.after(0, lambda i=idx, t=total, n=name: self.update_progress(i+1, t, n))
                     
                     if is_dir:
                         (local_path / name).mkdir(parents=True, exist_ok=True)
@@ -834,85 +816,144 @@ class OfflineSyncGUI:
                         except:
                             pass
                 
-                self.root.after(0, lambda: self.log(f"Downloaded folder {dirname}"))
+                if not self.cancel_download:
+                    self.root.after(0, lambda: self.log(f"Downloaded folder {dirname}"))
+                    self.root.after(0, lambda: self.local_refresh())
         except Exception as e:
             self.root.after(0, lambda: self.log(f"Error: {e}"))
-    
-    def http_upload_file(self):
-        if not self.http_connected:
-            messagebox.showwarning(self.lang.t("warning"), self.lang.t("ftp_not_connected"))
-            return
-        
-        filepath = filedialog.askopenfilename(title=self.lang.t("ftp_select_local"))
-        if not filepath:
-            return
-        
-        threading.Thread(target=self._http_upload_file, 
-                        args=(filepath,), daemon=True).start()
+        finally:
+            self.root.after(0, lambda: self.set_buttons_for_operation(False))
+            self.root.after(0, lambda: self.stop_progress())
     
     def _http_upload_file(self, filepath):
+        self.root.after(0, lambda: self.set_buttons_for_operation(True))
+        self.cancel_upload = False
+        
         try:
             filename = os.path.basename(filepath)
-            self.log(f"Uploading {filename}...")
+            self.log(f"{self.lang.t('uploading')} {filename}...")
             
-            files = {'file': open(filepath, 'rb')}
-            upload_path = self.http_current_dir + "/" + filename if self.http_current_dir else filename
+            with open(filepath, 'rb') as f:
+                files = {'file': (filename, f)}
+                r = requests.post(f"{self.base_url}/upload", files=files, timeout=300)
+                
+                if r.status_code == 200:
+                    self.root.after(0, self.http_refresh)
+                    self.root.after(0, lambda: self.log(f"Uploaded {filename}"))
+                else:
+                    self.root.after(0, lambda: self.log(f"Upload failed: {r.status_code}"))
+        except Exception as e:
+            self.root.after(0, lambda: self.log(f"Error: {e}"))
+        finally:
+            self.root.after(0, lambda: self.set_buttons_for_operation(False))
+            self.root.after(0, lambda: self.stop_progress())
+    
+    def local_refresh(self):
+        if not self.local_current_dir:
+            self.local_current_dir = self.sync_folder
+        
+        threading.Thread(target=self._local_refresh, daemon=True).start()
+    
+    def _local_refresh(self):
+        try:
+            dir_path = Path(self.local_current_dir) if self.local_current_dir else Path(self.sync_folder)
+            if not dir_path.exists():
+                dir_path = Path(self.sync_folder)
             
-            r = requests.post(f"{self.base_url}/upload", files=files, timeout=300)
+            items = []
+            for item in dir_path.iterdir():
+                prefix = "[DIR]" if item.is_dir() else "[FILE]"
+                items.append(f"{prefix} {item.name}")
             
-            if r.status_code == 200:
-                self.root.after(0, self.http_refresh)
-                self.root.after(0, lambda: self.log(f"Uploaded {filename}"))
-            else:
-                self.root.after(0, lambda: self.log(f"Upload failed: {r.status_code}"))
+            sorted_items = sorted(items, key=lambda x: (not x.startswith("[DIR]"), x.lower()))
+            
+            self.root.after(0, lambda: self._update_local_list(sorted_items))
+            self.root.after(0, lambda: self.local_dir_label.config(text=str(dir_path)))
         except Exception as e:
             self.root.after(0, lambda: self.log(f"Error: {e}"))
     
-    def upload_file(self, filepath, base_folder):
-        try:
-            rel_path = str(Path(filepath).relative_to(base_folder))
-            with open(filepath, 'rb') as f:
-                files = {'file': (rel_path, f)}
-                r = requests.post(f"{self.base_url}/upload", files=files, timeout=300)
-                if r.status_code == 200:
-                    self.log(f"Uploaded: {rel_path}")
-                    return True
-                else:
-                    self.log(f"Upload error: {r.status_code} - {r.text}")
-        except Exception as e:
-            self.log(f"Error: {e}")
-        return False
+    def _update_local_list(self, items):
+        self.local_file_listbox.delete(0, tk.END)
+        for item in items:
+            self.local_file_listbox.insert(tk.END, item)
     
-    def download_file(self, filename, base_folder):
+    def local_cdup(self):
+        current = Path(self.local_current_dir) if self.local_current_dir else Path(self.sync_folder)
+        parent = current.parent
+        if parent != current:
+            self.local_current_dir = str(parent)
+            self.local_dir_label.config(text=self.local_current_dir)
+            self.local_refresh()
+    
+    def local_on_double_click(self, event):
+        selection = self.local_file_listbox.curselection()
+        if selection:
+            item = self.local_file_listbox.get(selection[0])
+            if item.startswith("[DIR]"):
+                name = item.replace("[DIR]", "").strip()
+                self.local_current_dir = str(Path(self.local_current_dir) / name)
+                self.local_dir_label.config(text=self.local_current_dir)
+                self.local_refresh()
+    
+    def http_delete_selected(self):
+        if not self.http_connected or not self.base_url:
+            return
+        
+        selection = self.http_file_listbox.curselection()
+        if not selection:
+            return
+        
+        item = self.http_file_listbox.get(selection[0])
+        name = item.replace("[DIR]", "").replace("[FILE]", "").strip()
+        
+        if not messagebox.askyesno(self.lang.t("warning"), f"{self.lang.t('delete_confirm')} {name}"):
+            return
+        
+        threading.Thread(target=self._http_delete, args=(name, item.startswith("[DIR]")), daemon=True).start()
+    
+    def _http_delete(self, name, is_dir):
         try:
-            url = f"{self.base_url}/download?path={quote(filename)}"
-            self.log(f"Downloading: {filename}")
+            path = f"{self.http_current_dir}/{name}" if self.http_current_dir else name
+            url = f"{self.base_url}/delete?path={quote(path)}"
             
-            r = requests.get(url, timeout=300, stream=True)
+            r = requests.delete(url, timeout=30)
             if r.status_code == 200:
-                local_path = Path(base_folder) / filename
-                local_path.parent.mkdir(parents=True, exist_ok=True)
-                
-                total_size = int(r.headers.get('content-length', 0))
-                downloaded = 0
-                
-                with open(local_path, 'wb') as f:
-                    for chunk in r.iter_content(chunk_size=8192):
-                        f.write(chunk)
-                        downloaded += len(chunk)
-                
-                self.log(f"Downloaded: {filename}")
-                return True
+                self.root.after(0, lambda: self.log(f"{self.lang.t('delete_success')}: {name}"))
+                self.root.after(0, self.http_refresh)
             else:
-                self.log(f"Error: {r.status_code}")
+                self.root.after(0, lambda: self.log(f"{self.lang.t('delete_error')}: {r.text}"))
         except Exception as e:
-            self.log(f"Error: {e}")
-        return False
+            self.root.after(0, lambda: self.log(f"{self.lang.t('delete_error')}: {e}"))
+    
+    def local_delete_selected(self):
+        selection = self.local_file_listbox.curselection()
+        if not selection:
+            return
+        
+        item = self.local_file_listbox.get(selection[0])
+        name = item.replace("[DIR]", "").replace("[FILE]", "").strip()
+        
+        if not messagebox.askyesno(self.lang.t("warning"), f"{self.lang.t('delete_confirm')} {name}"):
+            return
+        
+        try:
+            path = Path(self.local_current_dir) / name
+            if path.is_dir():
+                import shutil
+                shutil.rmtree(path)
+            else:
+                path.unlink()
+            self.log(f"{self.lang.t('delete_success')}: {name}")
+            self.local_refresh()
+        except Exception as e:
+            self.log(f"{self.lang.t('delete_error')}: {e}")
     
     def stop_progress(self):
         self.progress['value'] = 0
         self.progress_label.config(text="")
         self.operation_label.config(text="")
+        self.cancel_download = False
+        self.cancel_upload = False
 
 
 class ZeroconfListener:
@@ -926,6 +967,12 @@ class ZeroconfListener:
             self.gui.devices.append({'name': name, 'ip': ip, 'port': info.port})
             self.gui.root.after(0, lambda: self.gui.device_listbox.insert(tk.END, f"{ip}:{info.port}"))
             self.gui.log(f"Found: {ip}:{info.port}")
+    
+    def remove_service(self, zc, type_, name):
+        pass
+    
+    def update_service(self, zc, type_, name):
+        pass
 
 
 def main():

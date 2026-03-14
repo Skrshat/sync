@@ -347,6 +347,41 @@ class WebServer(private val context: Context, private val serverPort: Int = 8080
                     Log.d(TAG, "=== BROWSE: $pathParam - ${items.size} items ===")
                     call.respondText(json, ContentType.Application.Json)
                 }
+
+                // Delete file or folder
+                delete("/delete") {
+                    val pathParam = call.parameters["path"] ?: ""
+                    if (pathParam.isEmpty()) {
+                        call.respondText("{\"error\":\"Missing path\",\"success\":false}", ContentType.Application.Json)
+                        return@delete
+                    }
+                    
+                    val syncDir = getSyncDirectory()
+                    val targetFile = File(syncDir, pathParam)
+                    
+                    if (!targetFile.exists()) {
+                        call.respondText("{\"error\":\"File not found\",\"success\":false}", ContentType.Application.Json)
+                        return@delete
+                    }
+                    
+                    val success = try {
+                        if (targetFile.isDirectory) {
+                            targetFile.deleteRecursively()
+                        } else {
+                            targetFile.delete()
+                        }
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Delete error: ${e.message}")
+                        false
+                    }
+                    
+                    if (success) {
+                        Log.d(TAG, "Deleted: $pathParam")
+                        call.respondText("{\"success\":true,\"path\":\"$pathParam\"}", ContentType.Application.Json)
+                    } else {
+                        call.respondText("{\"error\":\"Delete failed\",\"success\":false}", ContentType.Application.Json)
+                    }
+                }
             }
         }.start(wait = false)
         Log.d(TAG, "Ktor server started at ${address.hostAddress}:$serverPort")

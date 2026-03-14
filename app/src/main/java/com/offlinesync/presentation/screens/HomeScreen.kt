@@ -21,7 +21,7 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Message
 import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.CloudUpload
+
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -49,7 +49,7 @@ fun HomeScreen(
     onNavigateToRestoreSms: () -> Unit,
     onNavigateToBackupApps: () -> Unit,
     onNavigateToBackupMedia: () -> Unit,
-    onNavigateToFtpServer: () -> Unit,
+
     onNavigateToSettings: () -> Unit
 ) {
     val context = LocalContext.current
@@ -129,12 +129,6 @@ fun HomeScreen(
                 onClick = onNavigateToBackupMedia
             )
 
-            MenuButton(
-                text = strings.ftpServer,
-                icon = Icons.Default.CloudUpload,
-                onClick = onNavigateToFtpServer
-            )
-            
             Spacer(modifier = Modifier.height(16.dp))
             
             MenuButton(
