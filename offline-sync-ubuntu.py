@@ -14,6 +14,162 @@ from pathlib import Path
 from typing import Optional
 from urllib.parse import quote
 import zeroconf
+from ftplib import FTP
+
+
+class FtpClient:
+    """FTP клиент для работы с Android FTP сервером"""
+    
+    def __init__(self, host: str, port: int = 2121):
+        self.host = host
+        self.port = port
+        self.ftp = None
+        self.current_dir = "/"
+    
+    def connect(self, username: str = "anonymous", password: str = "") -> bool:
+        """Подключение к FTP серверу"""
+        try:
+            self.ftp = FTP()
+            self.ftp.connect(self.host, self.port, timeout=30)
+            self.ftp.login(username, password)
+            self.current_dir = self.ftp.pwd()
+            print(f"Подключено к FTP: {self.host}:{self.port}")
+            print(f"Текущая директория: {self.current_dir}")
+            return True
+        except Exception as e:
+            print(f"Ошибка подключения к FTP: {e}")
+            return False
+    
+    def disconnect(self):
+        """Отключение от FTP сервера"""
+        if self.ftp:
+            try:
+                self.ftp.quit()
+            except:
+                self.ftp.close()
+            self.ftp = None
+    
+    def list_files(self, path: str = ".") -> list:
+        """Получение списка файлов и папок"""
+        try:
+            self.ftp.cwd(path)
+            self.current_dir = self.ftp.pwd()
+            files = []
+            self.ftp.retrlines('LIST', lambda line: files.append(line))
+            return files
+        except Exception as e:
+            print(f"Ошибка получения списка: {e}")
+            return []
+    
+    def parse_listing(self, lines: list) -> list:
+        """Парсинг результата LIST"""
+        items = []
+        for line in lines:
+            parts = line.split()
+            if len(parts) >= 9:
+                is_dir = parts[0].startswith('d')
+                name = ' '.join(parts[8:])
+                if name not in ['.', '..']:
+                    items.append({
+                        'name': name,
+                        'is_dir': is_dir,
+                        'raw': line
+                    })
+        return items
+    
+    def download_file(self, remote_path: str, local_path: str) -> bool:
+        """Скачивание файла с FTP сервера"""
+        try:
+            local_file = Path(local_path)
+            local_file.parent.mkdir(parents=True, exist_ok=True)
+            
+            print(f"Скачивание: {remote_path} -> {local_path}")
+            with open(local_file, 'wb') as f:
+                self.ftp.retrbinary(f'RETR {remote_path}', f.write)
+            print(f"Скачано: {remote_path}")
+            return True
+        except Exception as e:
+            print(f"Ошибка скачивания: {e}")
+            return False
+    
+    def upload_file(self, local_path: str, remote_path: str = None) -> bool:
+        """Загрузка файла на FTP сервер"""
+        try:
+            local_file = Path(local_path)
+            if not local_file.exists():
+                print(f"Файл не существует: {local_path}")
+                return False
+            
+            if remote_path is None:
+                remote_path = local_file.name
+            
+            print(f"Загрузка: {local_path} -> {remote_path}")
+            with open(local_file, 'rb') as f:
+                self.ftp.storbinary(f'STOR {remote_path}', f)
+            print(f"Загружено: {remote_path}")
+            return True
+        except Exception as e:
+            print(f"Ошибка загрузки: {e}")
+            return False
+    
+    def download_directory(self, remote_dir: str, local_dir: str) -> int:
+        """Рекурсивное скачивание директории"""
+        downloaded = 0
+        try:
+            original_dir = self.ftp.pwd()
+            self.ftp.cwd(remote_dir)
+            
+            local_path = Path(local_dir)
+            local_path.mkdir(parents=True, exist_ok=True)
+            
+            items = self.parse_listing(self.list_files())
+            
+            for item in items:
+                if item['is_dir']:
+                    sub_count = self.download_directory(item['name'], str(local_path / item['name']))
+                    downloaded += sub_count
+                else:
+                    if self.download_file(item['name'], str(local_path / item['name'])):
+                        downloaded += 1
+            
+            self.ftp.cwd(original_dir)
+        except Exception as e:
+            print(f"Ошибка скачивания директории: {e}")
+        
+        return downloaded
+    
+    def upload_directory(self, local_dir: str, remote_dir: str = None) -> int:
+        """Рекурсивная загрузка директории"""
+        uploaded = 0
+        try:
+            local_path = Path(local_dir)
+            if not local_path.is_dir():
+                print(f"Директория не существует: {local_dir}")
+                return 0
+            
+            if remote_dir is None:
+                remote_dir = local_path.name
+            
+            try:
+                self.ftp.mkd(remote_dir)
+            except:
+                pass
+            
+            self.ftp.cwd(remote_dir)
+            
+            for item in local_path.iterdir():
+                if item.is_dir():
+                    sub_count = self.upload_directory(str(item), item.name)
+                    uploaded += sub_count
+                else:
+                    if self.upload_file(str(item), item.name):
+                        uploaded += 1
+            
+            self.ftp.cwd('..')
+        except Exception as e:
+            print(f"Ошибка загрузки директории: {e}")
+        
+        return uploaded
 
 
 class OfflineSyncClient:
@@ -268,7 +424,66 @@ def main():
     parser.add_argument('--sync', '-s', action='store_true', help='Двусторонняя синхронизация')
     parser.add_argument('--watch', '-w', action='store_true', help='Следить за изменениями (авто-синхронизация)')
     
+    # FTP options
+    parser.add_argument('--ftp', action='store_true', help='Использовать FTP режим')
+    parser.add_argument('--ftp-port', type=int, default=2121, help='Порт FTP сервера (по умолчанию: 2121)')
+    parser.add_argument('--ftp-user', default='anonymous', help='Имя пользователя FTP (по умолчанию: anonymous)')
+    parser.add_argument('--ftp-pass', default='', help='Пароль FTP (по умолчанию: пустой)')
+    parser.add_argument('--ftp-list', action='store_true', help='Показать список файлов на FTP')
+    parser.add_argument('--ftp-download', metavar='REMOTE', help='Скачать файл с FTP')
+    parser.add_argument('--ftp-upload', metavar='LOCAL', help='Загрузить файл на FTP')
+    parser.add_argument('--ftp-download-dir', metavar='REMOTE', help='Скачать директорию с FTP')
+    parser.add_argument('--ftp-upload-dir', metavar='LOCAL', help='Загрузить директорию на FTP')
+    
     args = parser.parse_args()
+    
+    # FTP mode
+    if args.ftp:
+        if not args.ip:
+            print("Ошибка: укажите IP адрес с --ip")
+            return
+        
+        ftp = FtpClient(args.ip, args.ftp_port)
+        if not ftp.connect(args.ftp_user, args.ftp_pass):
+            return
+        
+        try:
+            if args.ftp_list:
+                files = ftp.list_files()
+                items = ftp.parse_listing(files)
+                print(f"\nФайлы на FTP сервере ({ftp.current_dir}):")
+                for item in items:
+                    prefix = "[DIR]" if item['is_dir'] else "[FILE]"
+                    print(f"  {prefix} {item['name']}")
+            
+            elif args.ftp_download:
+                local_path = args.folder
+                if ftp.download_file(args.ftp_download, local_path):
+                    print("Скачивание завершено")
+            
+            elif args.ftp_upload:
+                if ftp.upload_file(args.ftp_upload):
+                    print("Загрузка завершена")
+            
+            elif args.ftp_download_dir:
+                local_path = args.folder
+                count = ftp.download_directory(args.ftp_download_dir, local_path)
+                print(f"Скачано файлов: {count}")
+            
+            elif args.ftp_upload_dir:
+                count = ftp.upload_directory(args.ftp_upload_dir)
+                print(f"Загружено файлов: {count}")
+            
+            else:
+                print("FTP команды:")
+                print("  --ftp-list                 Показать список файлов")
+                print("  --ftp-download <файл>      Скачать файл")
+                print("  --ftp-upload <файл>        Загрузить файл")
+                print("  --ftp-download-dir <папка> Скачать директорию")
+                print("  --ftp-upload-dir <папка>   Загрузить директорию")
+        finally:
+            ftp.disconnect()
+        return
     
     client = OfflineSyncClient(args.folder, args.ip, args.port)
     
@@ -308,11 +523,15 @@ def main():
             print("\nОстановлено")
     else:
         parser.print_help()
-        print("\nПримеры использования:")
+        print("\nПримеры использования (HTTP):")
         print("  offline-sync ~/SyncFolder --discover          # Найти устройства")
         print("  offline-sync ~/SyncFolder --ip 192.168.1.5    # Подключиться к устройству")
         print("  offline-sync ~/SyncFolder --sync               # Двусторонняя синхронизация")
         print("  offline-sync ~/SyncFolder --watch              # Авто-синхронизация")
+        print("\nПримеры использования (FTP):")
+        print("  offline-sync ~/Download --ftp --ip 192.168.1.5 --ftp-list")
+        print("  offline-sync ~/Download --ftp --ip 192.168.1.5 --ftp-download /DCIM/Camera")
+        print("  offline-sync ~/Music --ftp --ip 192.168.1.5 --ftp-upload-dir MyMusic")
 
 
 if __name__ == '__main__':

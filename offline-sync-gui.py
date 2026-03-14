@@ -17,6 +17,7 @@ import requests
 import hashlib
 import json
 import configparser
+from ftplib import FTP
 
 
 LANGUAGE_EN = "en"
@@ -72,6 +73,26 @@ TRANSLATIONS = {
         "warning": "Warning",
         "done": "Done",
         "cancel": "Cancel",
+        "ftp_server": "FTP Server",
+        "ftp_connect": "Connect",
+        "ftp_disconnect": "Disconnect",
+        "ftp_connected": "FTP Connected",
+        "ftp_not_connected": "FTP Not Connected",
+        "ftp_address": "FTP Address:",
+        "ftp_port": "Port:",
+        "ftp_user": "Username:",
+        "ftp_password": "Password:",
+        "ftp_browse": "Browse",
+        "ftp_download": "Download",
+        "ftp_upload": "Upload",
+        "ftp_refresh": "Refresh",
+        "ftp_download_dir": "Download Folder",
+        "ftp_upload_dir": "Upload Folder",
+        "ftp_current_dir": "Current:",
+        "ftp_files": "FTP Files",
+        "ftp_select_file": "Select file to download",
+        "ftp_select_local": "Select local file to upload",
+        "select_folder": "Select folder",
     },
     LANGUAGE_RU: {
         "app_title": "OfflineSync - Ubuntu ↔ Android",
@@ -121,8 +142,28 @@ TRANSLATIONS = {
         "warning": "Внимание",
         "done": "Готово",
         "cancel": "Отмена",
+        "ftp_server": "FTP Сервер",
+        "ftp_connect": "Подключить",
+        "ftp_disconnect": "Отключить",
+        "ftp_connected": "FTP Подключён",
+        "ftp_not_connected": "FTP Не подключён",
+        "ftp_address": "Адрес FTP:",
+        "ftp_port": "Порт:",
+        "ftp_user": "Пользователь:",
+        "ftp_password": "Пароль:",
+        "ftp_browse": "Обзор",
+        "ftp_download": "Скачать",
+        "ftp_upload": "Загрузить",
+        "ftp_refresh": "Обновить",
+        "ftp_download_dir": "Скачать папку",
+        "ftp_upload_dir": "Загрузить папку",
+        "ftp_current_dir": "Текущая:",
+        "ftp_files": "Файлы FTP",
+        "ftp_select_file": "Выберите файл для скачивания",
+        "ftp_select_local": "Выберите локальный файл для загрузки",
+        "select_folder": "Выберите папку",
     },
-    LANGUAGE_UK: {
+    LANGUAGE_RU: {
         "app_title": "OfflineSync - Ubuntu ↔ Android",
         "folder": "Папка:",
         "browse": "Вибрати",
@@ -170,6 +211,26 @@ TRANSLATIONS = {
         "warning": "Попередження",
         "done": "Готово",
         "cancel": "Скасувати",
+        "ftp_server": "FTP Сервер",
+        "ftp_connect": "Підключити",
+        "ftp_disconnect": "Відключити",
+        "ftp_connected": "FTP Підключено",
+        "ftp_not_connected": "FTP Не підключено",
+        "ftp_address": "Адреса FTP:",
+        "ftp_port": "Порт:",
+        "ftp_user": "Користувач:",
+        "ftp_password": "Пароль:",
+        "ftp_browse": "Огляд",
+        "ftp_download": "Скачати",
+        "ftp_upload": "Завантажити",
+        "ftp_refresh": "Оновити",
+        "ftp_download_dir": "Скачати папку",
+        "ftp_upload_dir": "Завантажити папку",
+        "ftp_current_dir": "Поточна:",
+        "ftp_files": "Файли FTP",
+        "ftp_select_file": "Оберіть файл для скачування",
+        "ftp_select_local": "Оберіть локальний файл для завантаження",
+        "select_folder": "Оберіть папку",
     }
 }
 
@@ -265,6 +326,13 @@ class OfflineSyncGUI:
         self.base_url = None
         self.pending_uploads = []
         
+        # FTP client variables
+        self.ftp = None
+        self.ftp_connected = False
+        self.ftp_ip = ""
+        self.ftp_port = 2121
+        self.ftp_current_dir = "/"
+        
         self.root.protocol("WM_DELETE_WINDOW", self.on_close)
         
         self.setup_ui()
@@ -323,6 +391,72 @@ class OfflineSyncGUI:
         btn_frame.pack(pady=10)
         tk.Button(btn_frame, text=self.lang.t("sync"), bg="#2196F3", fg="white", 
                  command=self.do_sync).pack(side=tk.LEFT, padx=5)
+        
+        # FTP Server section
+        ftp_frame = tk.LabelFrame(self.root, text=self.lang.t("ftp_server"), padx=10, pady=10)
+        ftp_frame.pack(fill=tk.X, padx=20, pady=10)
+        
+        ftp_top = tk.Frame(ftp_frame)
+        ftp_top.pack(fill=tk.X)
+        
+        tk.Label(ftp_top, text=self.lang.t("ftp_address")).pack(side=tk.LEFT)
+        self.ftp_ip_entry = tk.Entry(ftp_top, width=15)
+        self.ftp_ip_entry.insert(0, "192.168.1.")
+        self.ftp_ip_entry.pack(side=tk.LEFT, padx=5)
+        
+        tk.Label(ftp_top, text=self.lang.t("ftp_port")).pack(side=tk.LEFT)
+        self.ftp_port_entry = tk.Entry(ftp_top, width=6)
+        self.ftp_port_entry.insert(0, "2121")
+        self.ftp_port_entry.pack(side=tk.LEFT, padx=5)
+        
+        tk.Label(ftp_top, text=self.lang.t("ftp_user")).pack(side=tk.LEFT)
+        self.ftp_user_entry = tk.Entry(ftp_top, width=10)
+        self.ftp_user_entry.insert(0, "anonymous")
+        self.ftp_user_entry.pack(side=tk.LEFT, padx=5)
+        
+        tk.Label(ftp_top, text=self.lang.t("ftp_password")).pack(side=tk.LEFT)
+        self.ftp_pass_entry = tk.Entry(ftp_top, width=10, show="*")
+        self.ftp_pass_entry.pack(side=tk.LEFT, padx=5)
+        
+        self.ftp_connect_btn = tk.Button(ftp_top, text=self.lang.t("ftp_connect"), 
+                                         command=self.ftp_connect)
+        self.ftp_connect_btn.pack(side=tk.LEFT, padx=5)
+        
+        ftp_mid = tk.Frame(ftp_frame)
+        ftp_mid.pack(fill=tk.X, pady=5)
+        
+        self.ftp_status_label = tk.Label(ftp_mid, text=self.lang.t("ftp_not_connected"), fg="gray")
+        self.ftp_status_label.pack(side=tk.LEFT)
+        
+        tk.Label(ftp_mid, text=self.lang.t("ftp_current_dir")).pack(side=tk.LEFT, padx=(20, 5))
+        self.ftp_dir_label = tk.Label(ftp_mid, text="/", fg="blue")
+        self.ftp_dir_label.pack(side=tk.LEFT)
+        
+        ftp_file_frame = tk.Frame(ftp_frame)
+        ftp_file_frame.pack(fill=tk.BOTH, expand=True, pady=5)
+        
+        self.ftp_file_listbox = tk.Listbox(ftp_file_frame, height=8)
+        self.ftp_file_listbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        self.ftp_file_listbox.bind('<Double-Button-1>', self.ftp_on_double_click)
+        
+        ftp_scroll = tk.Scrollbar(ftp_file_frame, orient=tk.VERTICAL)
+        ftp_scroll.pack(side=tk.RIGHT, fill=tk.Y)
+        self.ftp_file_listbox.config(yscrollcommand=ftp_scroll.set)
+        ftp_scroll.config(command=self.ftp_file_listbox.yview)
+        
+        ftp_btn_row = tk.Frame(ftp_frame)
+        ftp_btn_row.pack(fill=tk.X, pady=5)
+        
+        tk.Button(ftp_btn_row, text=self.lang.t("ftp_download"), 
+                  command=self.ftp_download_file).pack(side=tk.LEFT, padx=2)
+        tk.Button(ftp_btn_row, text=self.lang.t("ftp_upload"), 
+                  command=self.ftp_upload_file).pack(side=tk.LEFT, padx=2)
+        tk.Button(ftp_btn_row, text=self.lang.t("ftp_download_dir"), 
+                  command=self.ftp_download_dir).pack(side=tk.LEFT, padx=2)
+        tk.Button(ftp_btn_row, text=self.lang.t("ftp_upload_dir"), 
+                  command=self.ftp_upload_dir).pack(side=tk.LEFT, padx=2)
+        tk.Button(ftp_btn_row, text=self.lang.t("ftp_refresh"), 
+                  command=self.ftp_refresh).pack(side=tk.LEFT, padx=2)
         
         log_frame = tk.LabelFrame(self.root, text=self.lang.t("log"), padx=10, pady=10)
         log_frame.pack(fill=tk.BOTH, expand=True, padx=20, pady=10)
@@ -586,6 +720,272 @@ class OfflineSyncGUI:
         self.overwrite_frame.pack_forget()
         self.pending_uploads = []
         self.log("Загрузка отменена")
+    
+    # FTP Client methods
+    def ftp_connect(self):
+        """Connect to FTP server"""
+        self.ftp_ip = self.ftp_ip_entry.get().strip()
+        self.ftp_port = int(self.ftp_port_entry.get().strip())
+        ftp_user = self.ftp_user_entry.get().strip()
+        ftp_pass = self.ftp_pass_entry.get()
+        
+        if not self.ftp_ip:
+            messagebox.showwarning(self.lang.t("warning"), "Enter FTP server IP")
+            return
+        
+        threading.Thread(target=self._ftp_connect, 
+                        args=(self.ftp_ip, self.ftp_port, ftp_user, ftp_pass), 
+                        daemon=True).start()
+    
+    def _ftp_connect(self, ip, port, user, password):
+        try:
+            if self.ftp:
+                try:
+                    self.ftp.quit()
+                except:
+                    self.ftp.close()
+            
+            self.ftp = FTP()
+            self.ftp.connect(ip, port, timeout=30)
+            self.ftp.login(user, password)
+            self.ftp_current_dir = self.ftp.pwd()
+            
+            self.ftp_connected = True
+            self.root.after(0, self._ftp_on_connected)
+            self.root.after(0, self.ftp_refresh)
+        except Exception as e:
+            self.root.after(0, lambda: messagebox.showerror(self.lang.t("error"), f"FTP Error: {e}"))
+    
+    def _ftp_on_connected(self):
+        self.ftp_status_label.config(text=f"{self.lang.t('ftp_connected')}: {self.ftp_ip}", fg="green")
+        self.ftp_connect_btn.config(text=self.lang.t("ftp_disconnect"), command=self.ftp_disconnect)
+        self.ftp_dir_label.config(text=self.ftp_current_dir)
+    
+    def ftp_disconnect(self):
+        """Disconnect from FTP server"""
+        if self.ftp:
+            try:
+                self.ftp.quit()
+            except:
+                self.ftp.close()
+            self.ftp = None
+        self.ftp_connected = False
+        self.ftp_status_label.config(text=self.lang.t("ftp_not_connected"), fg="gray")
+        self.ftp_connect_btn.config(text=self.lang.t("ftp_connect"), command=self.ftp_connect)
+        self.ftp_file_listbox.delete(0, tk.END)
+        self.ftp_dir_label.config(text="/")
+    
+    def ftp_refresh(self):
+        """Refresh FTP file list"""
+        if not self.ftp_connected or not self.ftp:
+            return
+        
+        threading.Thread(target=self._ftp_refresh, daemon=True).start()
+    
+    def _ftp_refresh(self):
+        try:
+            self.ftp.cwd(self.ftp_current_dir)
+            files = []
+            self.ftp.retrlines('LIST', files.append)
+            
+            items = []
+            for line in files:
+                parts = line.split()
+                if len(parts) >= 9:
+                    is_dir = parts[0].startswith('d')
+                    name = ' '.join(parts[8:])
+                    if name not in ['.', '..']:
+                        prefix = "[DIR]" if is_dir else "[FILE]"
+                        items.append(f"{prefix} {name}")
+            
+            self.root.after(0, lambda: self._update_ftp_list(items))
+        except Exception as e:
+            self.root.after(0, lambda: self.log(f"FTP Error: {e}"))
+    
+    def _update_ftp_list(self, items):
+        self.ftp_file_listbox.delete(0, tk.END)
+        for item in items:
+            self.ftp_file_listbox.insert(tk.END, item)
+    
+    def ftp_on_double_click(self, event):
+        """Handle double click on FTP file list"""
+        if not self.ftp_connected or not self.ftp:
+            return
+        
+        selection = self.ftp_file_listbox.curselection()
+        if selection:
+            item = self.ftp_file_listbox.get(selection[0])
+            if item.startswith("[DIR]"):
+                name = item.replace("[DIR]", "").strip()
+                self.ftp_current_dir = f"{self.ftp_current_dir}/{name}".replace("//", "/")
+                self.ftp_dir_label.config(text=self.ftp_current_dir)
+                self.ftp_refresh()
+    
+    def ftp_download_file(self):
+        """Download selected file from FTP"""
+        if not self.ftp_connected or not self.ftp:
+            messagebox.showwarning(self.lang.t("warning"), self.lang.t("ftp_not_connected"))
+            return
+        
+        selection = self.ftp_file_listbox.curselection()
+        if not selection:
+            messagebox.showwarning(self.lang.t("warning"), self.lang.t("ftp_select_file"))
+            return
+        
+        item = self.ftp_file_listbox.get(selection[0])
+        if item.startswith("[DIR]"):
+            self.ftp_download_dir()
+            return
+        
+        filename = item.replace("[FILE]", "").strip()
+        
+        folder = filedialog.askdirectory(title=self.lang.t("select_folder"))
+        if not folder:
+            return
+        
+        threading.Thread(target=self._ftp_download_file, 
+                        args=(filename, folder), daemon=True).start()
+    
+    def _ftp_download_file(self, filename, folder):
+        try:
+            local_path = os.path.join(folder, filename)
+            self.log(f"FTP: Downloading {filename}...")
+            
+            with open(local_path, 'wb') as f:
+                self.ftp.retrbinary(f'RETR {filename}', f.write)
+            
+            self.root.after(0, lambda: self.log(f"FTP: Downloaded {filename}"))
+        except Exception as e:
+            self.root.after(0, lambda: self.log(f"FTP Error: {e}"))
+    
+    def ftp_download_dir(self):
+        """Download directory from FTP"""
+        if not self.ftp_connected or not self.ftp:
+            messagebox.showwarning(self.lang.t("warning"), self.lang.t("ftp_not_connected"))
+            return
+        
+        folder = filedialog.askdirectory(title=self.lang.t("select_folder"))
+        if not folder:
+            return
+        
+        threading.Thread(target=self._ftp_download_dir, 
+                        args=(self.ftp_current_dir, folder), daemon=True).start()
+    
+    def _ftp_download_dir(self, remote_dir, local_dir):
+        try:
+            count = self._download_recursive(remote_dir, local_dir, 0)
+            self.root.after(0, lambda: self.log(f"FTP: Downloaded {count} files"))
+        except Exception as e:
+            self.root.after(0, lambda: self.log(f"FTP Error: {e}"))
+    
+    def _download_recursive(self, remote_dir, local_dir, count):
+        orig_dir = self.ftp.pwd()
+        try:
+            self.ftp.cwd(remote_dir)
+        except:
+            return count
+        
+        local_path = Path(local_dir)
+        local_path.mkdir(parents=True, exist_ok=True)
+        
+        files = []
+        self.ftp.retrlines('LIST', files.append)
+        
+        for line in files:
+            parts = line.split()
+            if len(parts) >= 9:
+                is_dir = parts[0].startswith('d')
+                name = ' '.join(parts[8:])
+                if name not in ['.', '..']:
+                    if is_dir:
+                        count = self._download_recursive(name, str(local_path / name), count)
+                    else:
+                        try:
+                            with open(local_path / name, 'wb') as f:
+                                self.ftp.retrbinary(f'RETR {name}', f.write)
+                            count += 1
+                        except:
+                            pass
+        
+        self.ftp.cwd(orig_dir)
+        return count
+    
+    def ftp_upload_file(self):
+        """Upload file to FTP"""
+        if not self.ftp_connected or not self.ftp:
+            messagebox.showwarning(self.lang.t("warning"), self.lang.t("ftp_not_connected"))
+            return
+        
+        filepath = filedialog.askopenfilename(title=self.lang.t("ftp_select_local"))
+        if not filepath:
+            return
+        
+        threading.Thread(target=self._ftp_upload_file, 
+                        args=(filepath,), daemon=True).start()
+    
+    def _ftp_upload_file(self, filepath):
+        try:
+            filename = os.path.basename(filepath)
+            self.log(f"FTP: Uploading {filename}...")
+            
+            with open(filepath, 'rb') as f:
+                self.ftp.storbinary(f'STOR {filename}', f)
+            
+            self.root.after(0, self.ftp_refresh)
+            self.root.after(0, lambda: self.log(f"FTP: Uploaded {filename}"))
+        except Exception as e:
+            self.root.after(0, lambda: self.log(f"FTP Error: {e}"))
+    
+    def ftp_upload_dir(self):
+        """Upload directory to FTP"""
+        if not self.ftp_connected or not self.ftp:
+            messagebox.showwarning(self.lang.t("warning"), self.lang.t("ftp_not_connected"))
+            return
+        
+        folder = filedialog.askdirectory(title=self.lang.t("select_folder"))
+        if not folder:
+            return
+        
+        threading.Thread(target=self._ftp_upload_dir, 
+                        args=(folder,), daemon=True).start()
+    
+    def _ftp_upload_dir(self, folder):
+        try:
+            folder_name = os.path.basename(folder)
+            count = self._upload_recursive(folder, folder_name, 0)
+            self.root.after(0, self.ftp_refresh)
+            self.root.after(0, lambda: self.log(f"FTP: Uploaded {count} files"))
+        except Exception as e:
+            self.root.after(0, lambda: self.log(f"FTP Error: {e}"))
+    
+    def _upload_recursive(self, local_dir, remote_dir, count):
+        local_path = Path(local_dir)
+        
+        try:
+            self.ftp.mkd(remote_dir)
+        except:
+            pass
+        
+        orig_dir = self.ftp.pwd()
+        try:
+            self.ftp.cwd(remote_dir)
+        except:
+            self.ftp.cwd(orig_dir)
+            return count
+        
+        for item in local_path.iterdir():
+            if item.is_dir():
+                count = self._upload_recursive(str(item), item.name, count)
+            else:
+                try:
+                    with open(item, 'rb') as f:
+                        self.ftp.storbinary(f'STOR {item.name}', f)
+                    count += 1
+                except:
+                    pass
+        
+        self.ftp.cwd(orig_dir)
+        return count
     
     def upload_file(self, filepath, base_folder):
         """Upload file to Android"""
